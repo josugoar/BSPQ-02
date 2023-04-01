@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 public class ExampleClient {
 
 	protected static final Logger logger = LogManager.getLogger();
-
+	private static final String NAME = "dipina";
 	private static final String USER = "dipina";
 	private static final String PASSWORD = "dipina";
 
@@ -32,11 +32,12 @@ public class ExampleClient {
 		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
 	}
 
-	public void registerUser(String login, String password) {
+	public void registerUser(String name, String login, String password) {
 		WebTarget registerUserWebTarget = webTarget.path("register");
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 		
 		UserData userData = new UserData();
+		userData.setName(name);
 		userData.setLogin(login);
 		userData.setPassword(password);
 		Response response = invocationBuilder.post(Entity.entity(userData, MediaType.APPLICATION_JSON));
@@ -47,12 +48,13 @@ public class ExampleClient {
 		}
 	}
 
-	public void sayMessage(String login, String password, String message) {
+	public void sayMessage(String name, String login, String password, String message) {
 		WebTarget sayHelloWebTarget = webTarget.path("sayMessage");
 		Invocation.Builder invocationBuilder = sayHelloWebTarget.request(MediaType.APPLICATION_JSON);
 
 		DirectMessage directMessage = new DirectMessage();
 		UserData userData = new UserData();
+		userData.setName(name);
 		userData.setLogin(login);
 		userData.setPassword(password);
 
@@ -81,7 +83,7 @@ public class ExampleClient {
 		String port = args[1];
 
 		ExampleClient exampleClient = new ExampleClient(hostname, port);
-		exampleClient.registerUser(USER, PASSWORD);
-		exampleClient.sayMessage(USER, PASSWORD, "This is a test!...");
+		exampleClient.registerUser(NAME, USER, PASSWORD);
+		exampleClient.sayMessage(NAME, USER, PASSWORD, "This is a test!...");
 	}
 }
