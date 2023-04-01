@@ -1,4 +1,4 @@
-Jersey + DataNucleus + MySQL
+Learnify
 ============================
 
 This example relies on the DataNucleus Maven plugin. Check the database configuration in the *datanucleus.properties* file and the JDBC driver dependency specified in the *pom.xml* file. In addition, the project contains the server and client example codes.
