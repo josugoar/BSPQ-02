@@ -4,9 +4,18 @@ public class UserData {
 
     private String login;
     private String password;
+    private String name;
 
     public UserData() {
         // required by serialization
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLogin() {

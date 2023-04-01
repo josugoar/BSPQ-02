@@ -13,6 +13,7 @@ public class User {
 	@PrimaryKey
 	String login=null;
 	String password=null;
+	String name=null;
 	
 	@Persistent(mappedBy="user", dependentElement="true")
 	@Join
@@ -20,9 +21,10 @@ public class User {
 	
 	
 	
-	public User(String login, String password) {
+	public User(String name, String login, String password) {
 		this.login = login;
 		this.password = password;
+		this.name = name;
 	}
 	
 	public void addMessage(Message message) {
@@ -31,6 +33,10 @@ public class User {
 
 	public void removeMessage(Message message) {
 		messages.remove(message);
+	}
+
+	public String getName() {
+		return this.login;
 	}
 
 	public String getLogin() {
@@ -52,6 +58,6 @@ public class User {
 		for (Message message: this.messages) {
 			messagesStr.append(message.toString() + " - ");
 		}
-        return "User: login --> " + this.login + ", password -->  " + this.password + ", messages --> [" + messagesStr + "]";
+        return "User: name --> " + this.name + ", login -->" + this.login + ", password -->  " + this.password + ", messages --> [" + messagesStr + "]";
     }
 }
