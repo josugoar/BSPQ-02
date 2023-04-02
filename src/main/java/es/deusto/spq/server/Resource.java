@@ -15,6 +15,7 @@ import es.deusto.spq.pojo.UserData;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -126,6 +127,39 @@ public class Resource {
 			}
 		}
     }
+
+	@DELETE
+	@Path("/{login}/delete")
+    public Response deleteUser(@PathParam("login") String login, UserData userData) {
+		try {
+			tx.begin();
+			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
+			User user = null;
+			try {
+				user = pm.getObjectById(User.class, userData.getLogin());
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("User: {}", user);
+			if (user != null) {
+				logger.info("Deleting user: {}", user);
+				pm.deletePersistent(user);
+				logger.info("Deleted user: {}", user);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			} else {
+				logger.info("The user does not exist");
+
+				tx.commit();
+				return Response.status(Status.BAD_REQUEST).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+	}
 
 
 	@POST
