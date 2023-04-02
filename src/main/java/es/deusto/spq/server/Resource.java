@@ -16,6 +16,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -29,7 +30,6 @@ public class Resource {
 
 	protected static final Logger logger = LogManager.getLogger();
 
-	private int cont = 0;
 	private PersistenceManager pm = null;
 	private Transaction tx = null;
 
@@ -37,6 +37,43 @@ public class Resource {
 		PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory("datanucleus.properties");
 		this.pm = pmf.getPersistenceManager();
 		this.tx = pm.currentTransaction();
+	}
+
+	@GET
+	@Path("/login")
+	public Response login(@QueryParam("login") String login, @QueryParam("password") String password) {
+		User user = null;
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			try (Query<?> q = pm.newQuery("SELECT FROM " + User.class.getName() + " WHERE login == \""
+					+ login + "\" &&  password == \""
+					+ password + "\"")) {
+				q.setUnique(true);
+				user = (User) q.execute();
+
+				logger.info("User retrieved: {}", user);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tx.commit();
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+
+		if (user != null) {
+			logger.info(" * Client login: {}", login);
+			UserData userData = new UserData();
+			userData.setLogin(login);
+			userData.setPassword(password);
+			return Response.ok(userData).build();
+		} else {
+			return Response.status(Status.BAD_REQUEST)
+					.entity("Login details supplied for message delivery are not correct").build();
+		}
 	}
 
 	@POST
@@ -70,8 +107,7 @@ public class Resource {
 		}
 
 		if (user != null) {
-			cont++;
-			logger.info(" * Client number: {}", cont);
+			logger.info(" * Client login: {}", user.getLogin());
 			MessageData messageData = new MessageData();
 			messageData.setMessage(directMessage.getMessageData().getMessage());
 			return Response.ok(messageData).build();
