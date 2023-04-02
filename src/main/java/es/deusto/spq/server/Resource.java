@@ -100,7 +100,7 @@ public class Resource {
 				logger.info("Password set user: {}", user);
 			} else {
 				logger.info("Creating user: {}", user);
-				user = new User(userData.getName(), userData.getLogin(), userData.getPassword());
+				user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname());
 				pm.makePersistent(user);
 				logger.info("User created: {}", user);
 			}
