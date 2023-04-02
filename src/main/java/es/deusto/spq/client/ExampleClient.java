@@ -23,7 +23,6 @@ public class ExampleClient {
 	private static final String USER = "dipina";
 	private static final String PASSWORD = "dipina";
 
-
 	private Client client;
 	private WebTarget webTarget;
 
@@ -35,7 +34,7 @@ public class ExampleClient {
 	public void registerUser(String name, String login, String password) {
 		WebTarget registerUserWebTarget = webTarget.path("register");
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
-		
+
 		UserData userData = new UserData();
 		userData.setName(name);
 		userData.setLogin(login);
@@ -66,7 +65,7 @@ public class ExampleClient {
 
 		Response response = invocationBuilder.post(Entity.entity(directMessage, MediaType.APPLICATION_JSON));
 		if (response.getStatus() != Status.OK.getStatusCode()) {
-			logger.error("Error connecting with the server. Code: {}",response.getStatus());
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
 		} else {
 			String responseMessage = response.readEntity(String.class);
 			logger.info("* Message coming from the server: '{}'", responseMessage);
