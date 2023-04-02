@@ -1,5 +1,7 @@
 package es.deusto.spq.server;
 
+import java.util.List;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
@@ -7,9 +9,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.Transaction;
 
 import es.deusto.spq.server.jdo.User;
-import es.deusto.spq.server.jdo.Message;
-import es.deusto.spq.pojo.DirectMessage;
-import es.deusto.spq.pojo.MessageData;
 import es.deusto.spq.pojo.UserData;
 
 import javax.ws.rs.GET;
@@ -33,7 +32,6 @@ public class Resource {
 
 	protected static final Logger logger = LogManager.getLogger();
 
-	private int cont = 0;
 	private PersistenceManager pm = null;
 	private Transaction tx = null;
 
@@ -41,48 +39,6 @@ public class Resource {
 		PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory("datanucleus.properties");
 		this.pm = pmf.getPersistenceManager();
 		this.tx = pm.currentTransaction();
-	}
-
-	@POST
-	@Path("/sayMessage")
-	public Response sayMessage(DirectMessage directMessage) {
-		User user = null;
-		try {
-			tx.begin();
-			logger.info("Creating query ...");
-
-			try (Query<?> q = pm.newQuery("SELECT FROM " + User.class.getName() + " WHERE login == \""
-					+ directMessage.getUserData().getLogin() + "\" &&  password == \""
-					+ directMessage.getUserData().getPassword() + "\"")) {
-				q.setUnique(true);
-				user = (User) q.execute();
-
-				logger.info("User retrieved: {}", user);
-				if (user != null) {
-					Message message = new Message(directMessage.getMessageData().getMessage());
-					user.getMessages().add(message);
-					pm.makePersistent(user);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			tx.commit();
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
-		}
-
-		if (user != null) {
-			cont++;
-			logger.info(" * Client number: {}", cont);
-			MessageData messageData = new MessageData();
-			messageData.setMessage(directMessage.getMessageData().getMessage());
-			return Response.ok(messageData).build();
-		} else {
-			return Response.status(Status.BAD_REQUEST)
-					.entity("Login details supplied for message delivery are not correct").build();
-		}
 	}
 
 	@PUT
@@ -118,7 +74,7 @@ public class Resource {
 				//pm.makePersistent(user); ????
 
 				tx.commit();
-				return Response.status(Status.OK).build();
+				return Response.status(Status.OK).entity(user).build();
 			} else {
 				logger.info("The user does not exist");
 
@@ -181,9 +137,40 @@ public class Resource {
 			logger.info("User: {}", user);
 			if (user != null) {
 				tx.commit();
-				return Response.ok(user).build();
+				return Response.status(Status.OK).entity(user).build();
 			} else {
 				logger.info("The user does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+	}
+
+	@GET
+	@Path("/users")
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response getUsers() {
+		List<User> users = null;
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			try (Query<User> q = pm.newQuery(User.class)) {
+				users = q.executeList();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			if (users != null) {
+				tx.commit();
+				return Response.status(Status.OK).entity(users).build();
+			} else {
+				logger.info("Users not found");
 
 				tx.commit();
 				return Response.status(Status.NOT_FOUND).build();
@@ -229,12 +216,5 @@ public class Resource {
 			}
 
 		}
-	}
-
-	@GET
-	@Path("/hello")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response sayHello() {
-		return Response.ok("Hello world!").build();
 	}
 }
