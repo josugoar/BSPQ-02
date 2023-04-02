@@ -14,15 +14,17 @@ public class User {
 	String login = null;
 	String password = null;
 	String name = null;
+	String surname = null;
 
 	@Persistent(mappedBy = "user", dependentElement = "true")
 	@Join
 	Set<Message> messages = new HashSet<>();
 
-	public User(String name, String login, String password) {
+	public User(String login, String password, String name, String surname) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
+		this.surname = surname;
 	}
 
 	public void addMessage(Message message) {
@@ -34,7 +36,11 @@ public class User {
 	}
 
 	public String getName() {
-		return this.login;
+		return this.name;
+	}
+
+	public String getSurname() {
+		return this.surname;
 	}
 
 	public String getLogin() {
@@ -58,7 +64,7 @@ public class User {
 		for (Message message : this.messages) {
 			messagesStr.append(message.toString() + " - ");
 		}
-		return "User: name --> " + this.name + ", login -->" + this.login + ", password -->  " + this.password
+		return "User: name --> " + this.name + ", surname --> " + this.surname + ", login -->" + this.login + ", password -->  " + this.password
 				+ ", messages --> [" + messagesStr + "]";
 	}
 }
