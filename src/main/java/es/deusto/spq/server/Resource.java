@@ -105,7 +105,7 @@ public class Resource {
 				user.setPassword(userData.getPassword());
 				logger.info("Password set user: {}", user);
 
-				logger.info("Setting password user: {}", user);
+				logger.info("Setting name user: {}", user);
 				user.setName(userData.getName());
 				logger.info("Password set user: {}", user);
 
@@ -113,13 +113,17 @@ public class Resource {
 				user.setSurname(userData.getSurname());
 				logger.info("Surname set user: {}", user);
 
+				logger.info("User updated: {}", user);
+
+				//pm.makePersistent(user); ????
+
 				tx.commit();
 				return Response.status(Status.OK).build();
 			} else {
 				logger.info("The user does not exist");
 
 				tx.commit();
-				return Response.status(Status.BAD_REQUEST).build();
+				return Response.status(Status.NOT_FOUND).build();
 			}
 		} finally {
 			if (tx.isActive()) {
@@ -152,7 +156,37 @@ public class Resource {
 				logger.info("The user does not exist");
 
 				tx.commit();
-				return Response.status(Status.BAD_REQUEST).build();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+	}
+
+	@GET
+	@Path("/{login}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUser(@PathParam("login") String login, UserData userData) {
+		try {
+			tx.begin();
+			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
+			User user = null;
+			try {
+				user = pm.getObjectById(User.class, userData.getLogin());
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("User: {}", user);
+			if (user != null) {
+				tx.commit();
+				return Response.ok(user).build();
+			} else {
+				logger.info("The user does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
 			}
 		} finally {
 			if (tx.isActive()) {
