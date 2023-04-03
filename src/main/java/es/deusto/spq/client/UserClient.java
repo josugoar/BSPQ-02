@@ -10,7 +10,11 @@ import es.deusto.spq.pojo.UserData;
 public class UserClient extends JFrame {
 
     public UserClient(UserData userData) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setSize(600,500);
+
+        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
     
         JPanel loginPanel = new JPanel();
         JLabel loginKeyLabel = new JLabel("Login");
