@@ -60,27 +60,12 @@ public class WindowDashboard extends JFrame {
 	private WebTarget webTarget;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-
-					WindowDashboard frame = new WindowDashboard("127.0.0.1", "8080");
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
 	
 	public WindowDashboard(String hostname, String port) {
+
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		client = ClientBuilder.newClient();
 		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
