@@ -6,9 +6,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
+import javax.jdo.listener.DeleteLifecycleListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import java.awt.Font;
+
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -30,12 +33,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 
 import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.UserData;
+import es.deusto.spq.server.jdo.User;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -269,6 +275,23 @@ public class WindowDashboard extends JFrame {
 				return columnEditables[column];
 			}
 		});
+
+		table.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent evt) {
+				UserData user = new UserData();
+				JTable table = (JTable)evt.getSource();
+				int row = table.getSelectedRow();
+				String email = (String)table.getValueAt(row, 0);
+				user = getUser(email);
+				textEmailInfo.setText(user.getLogin());
+				textPasswordInfo.setText(user.getPassword());
+				textNameInfo.setText(user.getName());
+				textLastNameInfo.setText(user.getSurname());
+				textField_1.setText(user.getRole().name());
+				update();
+			}
+		});
 		
 		JScrollPane scrollTable = new JScrollPane(table);
 		panelTable.add(scrollTable);
@@ -349,7 +372,8 @@ public class WindowDashboard extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Llamar al endpoint DELETE para eliminar una cuenta
+				
+				deleteUser(textEmailInfo.getText());
 				update();
 				
 			}
@@ -362,7 +386,7 @@ public class WindowDashboard extends JFrame {
 		myModel.setRowCount(0);
 		List<UserData> users = getUsers();
 		for (UserData user : users) {
-
+			System.out.println(user.getLogin());
 			Object[] data = {
 				user.getLogin(),
 				user.getPassword(),
@@ -419,14 +443,7 @@ public class WindowDashboard extends JFrame {
 		}
 	}
 
-	private void deleteUser(String email, String password, String name, String surname, Role role){
-
-		UserData user = new UserData();
-		user.setLogin(email);
-		user.setPassword(password);
-		user.setName(name);
-		user.setSurname(surname);
-		user.setRole(role);
+	private void deleteUser(String email){
 	
 		WebTarget registerUserWebTarget = webTarget.path(email + "/delete");
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
@@ -450,8 +467,20 @@ public class WindowDashboard extends JFrame {
 		} else {
 			logger.info("User correctly updated");
 		}
-		
-		return (List<UserData>)response.getEntity();
+		return Arrays.asList(response.readEntity(UserData[].class));
+	}
+
+	private UserData getUser(String email) {
+		WebTarget registerUserWebTarget = webTarget.path("/" + email);
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.get();
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+		return response.readEntity(UserData.class);
 	}
 
 }
