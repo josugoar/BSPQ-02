@@ -9,7 +9,7 @@ Run the following command to build everything and enhance the DB classes:
 
 Make sure that the database was correctly configured. Use the contents of the file *create-learnify.sql* to create the database and grant privileges. For example,
 
-      mysql –uroot -p < sql/create-learnify.sql
+      mysql -p --user root < sql/create-learnify.sql
 
 Run the following command to create database schema for this sample.
 
