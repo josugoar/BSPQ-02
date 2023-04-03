@@ -15,6 +15,8 @@ import java.awt.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import es.deusto.spq.pojo.UserData;
+
 class LoginClient extends JFrame implements ActionListener {
     JButton b1;
     JPanel newPanel;
@@ -67,22 +69,9 @@ class LoginClient extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Error " + response.getStatus(), "Failure", JOptionPane.ERROR_MESSAGE);
         } else {
             logger.info("User correctly logged in");
-            UserClient userClient = new UserClient();
+            UserClient userClient = new UserClient(response.readEntity(UserData.class));
             setVisible(false);
             userClient.setVisible(true);
         }
-    }
-
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            logger.info("Use: java Client.Client [host] [port]");
-            System.exit(0);
-        }
-
-        String hostname = args[0];
-        String port = args[1];
-
-        LoginClient loginClient = new LoginClient(hostname, port);
-        loginClient.setVisible(true);
     }
 }
