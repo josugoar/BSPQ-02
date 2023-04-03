@@ -21,6 +21,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -179,8 +181,14 @@ public class Resource {
 			}
 			logger.info("User: {}", user);
 			if (user != null) {
+				UserData userData = new UserData();
+				userData.setLogin(user.getLogin());
+				userData.setPassword(user.getPassword());
+				userData.setName(user.getName());
+				userData.setSurname(user.getPassword());
+				userData.setRole(user.getRole());
 				tx.commit();
-				return Response.status(Status.OK).entity(user).build();
+				return Response.status(Status.OK).entity(userData).build();
 			} else {
 				logger.info("The user does not exist");
 
@@ -198,18 +206,15 @@ public class Resource {
 	@Path("/users")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers() {
-		List<User> users = new ArrayList<>();
+		List<User> users = null;
 		List<UserData> usersdat = new ArrayList<>();
 		try {
 			tx.begin();
 			logger.info("Creating query ...");
 
-			try (Query<User> q = pm.newQuery(User.class)) {
-				users = q.executeList();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
+			Query<User> q = pm.newQuery(User.class);
+			users = q.executeList();
+			
 			if (users != null) {
 				for (User user : users) {
 					UserData usdat = new UserData();
@@ -218,13 +223,21 @@ public class Resource {
 					usdat.setSurname(user.getSurname());
 					usdat.setRole(user.getRole());
 					usersdat.add(usdat);
-
+				}
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				tx.commit();
-				return Response.status(Status.OK).entity(usersdat).build();
+				return Response.status(Status.OK).entity(usersdat.toArray(new UserData[0])).build();
 			} else {
 				logger.info("Users not found");
-
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				tx.commit();
 				return Response.status(Status.NOT_FOUND).build();
 			}
