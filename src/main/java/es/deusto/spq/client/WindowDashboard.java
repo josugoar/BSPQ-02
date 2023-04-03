@@ -28,6 +28,8 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -82,6 +84,14 @@ public class WindowDashboard extends JFrame {
 
 		client = ClientBuilder.newClient();
 		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
+
+		this.addComponentListener(new ComponentAdapter() 
+		{  
+				public void componentResized(ComponentEvent evt) {
+					update();
+				}
+		});
+
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1280, 720);
@@ -208,15 +218,29 @@ public class WindowDashboard extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Llamar al endpoint EDIT para editar una cuenta
 				
+				updateUser(textEmail.getText(), 
+				textPassword.getText(), 
+				textName.getText(), 
+				textLastName.getText(), 
+				(Role)comboAccountType.getSelectedItem());
+
+				update();
 			}
 		});
 		btnCreateAccount.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Llamar al endpoint POST para crear una cuenta
+				
+				createUser(textEmail.getText(), 
+				textPassword.getText(), 
+				textName.getText(), 
+				textLastName.getText(), 
+				(Role)comboAccountType.getSelectedItem());
+
+				update();
+
 			}
 		});
 		
@@ -341,18 +365,33 @@ public class WindowDashboard extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Llamar al endpoint DELETE para eliminar una cuenta
+				update();
 				
 			}
 		});
 	}
 	
-	void update() {
-		/*
-		 * TODO Actualizar modelo de taba y contenido del panel de 
-		 * informacion cuando se selecciona una fila en la tabla
-		 */
-	}
+	private void update() {
 
+		DefaultTableModel myModel = (DefaultTableModel) table.getModel();
+		myModel.setRowCount(0);
+		List<UserData> users = getUsers();
+		for (UserData user : users) {
+
+			Object[] data = {
+				user.getLogin(),
+				user.getPassword(),
+				user.getName(),
+				user.getSurname(),
+				user.getRole(),
+			};
+
+			myModel.addRow(data);
+        }
+		revalidate();
+		repaint();
+
+	}
 
 	private void createUser(String email, String password, String name, String surname, Role role){
 
@@ -426,9 +465,6 @@ public class WindowDashboard extends JFrame {
 		} else {
 			logger.info("User correctly updated");
 		}
-		
-		List<UserData> userList;
-
 		
 		return (List<UserData>)response.getEntity();
 	}
