@@ -15,6 +15,10 @@ Run the following command to create database schema for this sample.
 
       mvn datanucleus:schema-create
 
+Run the following command to create an admin account.
+
+      mysql -p --user root < sql/create-admin.sql
+
 To launch the server run the command
 
       mvn jetty:run
