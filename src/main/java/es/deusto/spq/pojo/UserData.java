@@ -6,6 +6,7 @@ public class UserData {
     private String password;
     private String name;
     private String surname;
+    private Role role;
 
     public UserData() {
         // required by serialization
@@ -41,6 +42,14 @@ public class UserData {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return this.role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String toString() {

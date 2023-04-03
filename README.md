@@ -17,8 +17,8 @@ Run the following command to create database schema for this sample.
 
 To launch the server run the command
 
-    mvn jetty:run
+      mvn jetty:run
 
 Now, the client sample code can be executed in a new command window with
 
-    mvn exec:java -Pclient
+      mvn exec:java -Pclient

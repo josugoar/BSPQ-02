@@ -19,6 +19,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -42,10 +43,10 @@ public class Resource {
 	}
 
 	@PUT
-    @Path("/{login}/update")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@PathParam("login") String login, UserData userData) {
+  @Path("/{login}/update")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response updateUser(@PathParam("login") String login, UserData userData) {
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
@@ -71,8 +72,6 @@ public class Resource {
 
 				logger.info("User updated: {}", user);
 
-				//pm.makePersistent(user); ????
-
 				tx.commit();
 				return Response.status(Status.OK).entity(user).build();
 			} else {
@@ -86,11 +85,11 @@ public class Resource {
 				tx.rollback();
 			}
 		}
-    }
+  }
 
 	@DELETE
 	@Path("/{login}/delete")
-    public Response deleteUser(@PathParam("login") String login, UserData userData) {
+  public Response deleteUser(@PathParam("login") String login, UserData userData) {
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
@@ -113,18 +112,57 @@ public class Resource {
 
 				tx.commit();
 				return Response.status(Status.NOT_FOUND).build();
+		}  finally {
+			if (tx.isActive()) {
+				tx.rollback();
 			}
+		}
+  }
+
+	@GET
+	@Path("/login")
+	public Response login(@QueryParam("login") String login, @QueryParam("password") String password) {
+		User user = null;
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			try (Query<?> q = pm.newQuery("SELECT FROM " + User.class.getName() + " WHERE login == \""
+					+ login + "\" &&  password == \""
+					+ password + "\"")) {
+				q.setUnique(true);
+				user = (User) q.execute();
+
+				logger.info("User retrieved: {}", user);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tx.commit();
 		} finally {
 			if (tx.isActive()) {
 				tx.rollback();
 			}
 		}
+    
+    if (user != null) {
+			logger.info(" * Client login: {}", login);
+			UserData userData = new UserData();
+			userData.setLogin(user.getLogin());
+			userData.setPassword(user.getPassword());
+			userData.setName(user.getName());
+			userData.setSurname(user.getPassword());
+			userData.setRole(user.getRole());
+			return Response.ok(userData).build();
+		} else {
+			return Response.status(Status.BAD_REQUEST)
+					.entity("Login details supplied for message delivery are not correct").build();
+		}
 	}
 
 	@GET
 	@Path("/{login}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getUser(@PathParam("login") String login, UserData userData) {
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getUser(@PathParam("login") String login, UserData userData) {
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
@@ -154,7 +192,7 @@ public class Resource {
 	@GET
 	@Path("/users")
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response getUsers() {
+  public Response getUsers() {
 		List<User> users = null;
 		try {
 			tx.begin();
@@ -182,6 +220,47 @@ public class Resource {
 		}
 	}
 
+	@POST
+	@Path("/sayMessage")
+	public Response sayMessage(DirectMessage directMessage) {
+		User user = null;
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			try (Query<?> q = pm.newQuery("SELECT FROM " + User.class.getName() + " WHERE login == \""
+					+ directMessage.getUserData().getLogin() + "\" &&  password == \""
+					+ directMessage.getUserData().getPassword() + "\"")) {
+				q.setUnique(true);
+				user = (User) q.execute();
+
+				logger.info("User retrieved: {}", user);
+				if (user != null) {
+					Message message = new Message(directMessage.getMessageData().getMessage());
+					user.getMessages().add(message);
+					pm.makePersistent(user);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tx.commit();
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+
+		if (user != null) {
+			logger.info(" * Client login: {}", user.getLogin());
+			MessageData messageData = new MessageData();
+			messageData.setMessage(directMessage.getMessageData().getMessage());
+			return Response.ok(messageData).build();
+		} else {
+			return Response.status(Status.BAD_REQUEST)
+					.entity("Login details supplied for message delivery are not correct").build();
+		}
+	}
+
 
 	@POST
 	@Path("/register")
@@ -203,7 +282,7 @@ public class Resource {
 				return Response.status(Status.BAD_REQUEST).build();
 			} else {
 				logger.info("Creating user: {}", user);
-				user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname());
+				user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname(), userData.getRole());
 				pm.makePersistent(user);
 				logger.info("User created: {}", user);
 
