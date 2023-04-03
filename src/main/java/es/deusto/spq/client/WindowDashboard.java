@@ -178,14 +178,18 @@ public class WindowDashboard extends JFrame {
 		comboAccountType.setModel(new DefaultComboBoxModel(accountType.values()));
 		panelAccountType.add(comboAccountType);
 		
-		JPanel panelCreateAccountBtn = new JPanel();
-		panelCreateAccountBtn.setBorder(UIManager.getBorder("DesktopIcon.border"));
-		panelLeft.add(panelCreateAccountBtn);
-		panelCreateAccountBtn.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		JPanel panelCreateEditAccountBtns = new JPanel();
+		panelCreateEditAccountBtns.setBorder(UIManager.getBorder("DesktopIcon.border"));
+		panelLeft.add(panelCreateEditAccountBtns);
+		panelCreateEditAccountBtns.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JButton btnCreateAccount = new JButton("Crear Usuario");
 		btnCreateAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
-		panelCreateAccountBtn.add(btnCreateAccount);
+		panelCreateEditAccountBtns.add(btnCreateAccount);
+		
+		JButton btnEditAccount = new JButton("Editar Usuario");
+		btnEditAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
+		panelCreateEditAccountBtns.add(btnEditAccount);
 		btnCreateAccount.addActionListener(new ActionListener() {
 			
 			@Override
@@ -304,6 +308,13 @@ public class WindowDashboard extends JFrame {
 		textField_1.setEditable(false);
 		textField_1.setColumns(10);
 		panelTypeInfo.add(textField_1);
+		
+		JPanel panelDeleteAccount = new JPanel();
+		panelAccountInfo.add(panelDeleteAccount);
+		
+		JButton btnDeleteAccount = new JButton("Eliminar Usuario");
+		btnDeleteAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
+		panelDeleteAccount.add(btnDeleteAccount);
 	}
 	
 	void update() {
