@@ -15,6 +15,7 @@ import java.awt.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.UserData;
 
 class LoginClient extends JFrame implements ActionListener {
@@ -22,8 +23,15 @@ class LoginClient extends JFrame implements ActionListener {
     JPanel newPanel;
     JLabel userLabel, passLabel;
     final JTextField textField1, textField2;
+    private String hostname, port;
 
     public LoginClient(String hostname, String port) {
+        
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setSize(500,300);
+
+        this.hostname = hostname;
+        this.port = port;
         client = ClientBuilder.newClient();
         webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
 
@@ -69,9 +77,17 @@ class LoginClient extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Error " + response.getStatus(), "Failure", JOptionPane.ERROR_MESSAGE);
         } else {
             logger.info("User correctly logged in");
-            UserClient userClient = new UserClient(response.readEntity(UserData.class));
-            setVisible(false);
-            userClient.setVisible(true);
+            UserData user = response.readEntity(UserData.class);
+            if (user.getRole() == Role.STUDENT) {
+                UserClient userClient = new UserClient(user);
+                setVisible(false);
+                userClient.setVisible(true);
+            } else {
+                WindowDashboard dashboard = new WindowDashboard(hostname, port);
+                setVisible(false);
+                dashboard.setVisible(rootPaneCheckingEnabled);
+            }
+            
         }
     }
 }

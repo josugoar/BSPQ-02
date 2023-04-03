@@ -6,9 +6,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
+import javax.jdo.listener.DeleteLifecycleListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import java.awt.Font;
+
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
@@ -16,14 +22,33 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
 import javax.swing.table.DefaultTableModel;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.swing.JButton;
 import javax.swing.UIManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.DefaultComboBoxModel;
+
+import es.deusto.spq.pojo.Role;
+import es.deusto.spq.pojo.UserData;
+import es.deusto.spq.server.jdo.User;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class WindowDashboard extends JFrame {
 
+	protected static final Logger logger = LogManager.getLogger();
 	private JPanel contentPane;
 	private JTextField textEmail;
 	private JTextField textName;
@@ -36,38 +61,28 @@ public class WindowDashboard extends JFrame {
 	private JTextField textField_1;
 	private JTable table;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					WindowDashboard frame = new WindowDashboard();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+
+	private Client client;
+	private WebTarget webTarget;
 
 	/**
 	 * Create the frame.
 	 */
 	
-	private enum accountType {
-		ESTUDIANTE,
-		PROFESOR,
-		DECANO,
-		DIRECTOR
-	}
-	
-	public WindowDashboard() {
-		
-		
-		
-		
+	public WindowDashboard(String hostname, String port) {
+
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+		client = ClientBuilder.newClient();
+		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
+
+		this.addComponentListener(new ComponentAdapter() 
+		{  
+				public void componentResized(ComponentEvent evt) {
+					update();
+				}
+		});
+
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1280, 720);
@@ -175,23 +190,48 @@ public class WindowDashboard extends JFrame {
 		panelAccountType.add(lblAccountType);
 		
 		JComboBox comboAccountType = new JComboBox();
-		comboAccountType.setModel(new DefaultComboBoxModel(accountType.values()));
+		comboAccountType.setModel(new DefaultComboBoxModel(Role.values()));
 		panelAccountType.add(comboAccountType);
 		
-		JPanel panelCreateAccountBtn = new JPanel();
-		panelCreateAccountBtn.setBorder(UIManager.getBorder("DesktopIcon.border"));
-		panelLeft.add(panelCreateAccountBtn);
-		panelCreateAccountBtn.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		JPanel panelCreateEditAccountBtns = new JPanel();
+		panelCreateEditAccountBtns.setBorder(UIManager.getBorder("DesktopIcon.border"));
+		panelLeft.add(panelCreateEditAccountBtns);
+		panelCreateEditAccountBtns.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JButton btnCreateAccount = new JButton("Crear Usuario");
 		btnCreateAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
-		panelCreateAccountBtn.add(btnCreateAccount);
+		panelCreateEditAccountBtns.add(btnCreateAccount);
+		
+		JButton btnEditAccount = new JButton("Editar Usuario");
+		btnEditAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
+		panelCreateEditAccountBtns.add(btnEditAccount);
+		btnEditAccount.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				updateUser(textEmail.getText(), 
+				textPassword.getText(), 
+				textName.getText(), 
+				textLastName.getText(), 
+				(Role)comboAccountType.getSelectedItem());
+
+				update();
+			}
+		});
 		btnCreateAccount.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Llamar al endpoint POST para crear una cuenta
 				
+				createUser(textEmail.getText(), 
+				textPassword.getText(), 
+				textName.getText(), 
+				textLastName.getText(), 
+				(Role)comboAccountType.getSelectedItem());
+
+				update();
+
 			}
 		});
 		
@@ -223,7 +263,7 @@ public class WindowDashboard extends JFrame {
 			}
 		) {
 			Class[] columnTypes = new Class[] {
-				String.class, String.class, String.class, String.class, String.class
+				String.class, String.class, String.class, String.class, Role.class
 			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
@@ -233,6 +273,23 @@ public class WindowDashboard extends JFrame {
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
+			}
+		});
+
+		table.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent evt) {
+				UserData user = new UserData();
+				JTable table = (JTable)evt.getSource();
+				int row = table.getSelectedRow();
+				String email = (String)table.getValueAt(row, 0);
+				user = getUser(email);
+				textEmailInfo.setText(user.getLogin());
+				textPasswordInfo.setText(user.getPassword());
+				textNameInfo.setText(user.getName());
+				textLastNameInfo.setText(user.getSurname());
+				textField_1.setText(user.getRole().name());
+				update();
 			}
 		});
 		
@@ -304,13 +361,126 @@ public class WindowDashboard extends JFrame {
 		textField_1.setEditable(false);
 		textField_1.setColumns(10);
 		panelTypeInfo.add(textField_1);
+		
+		JPanel panelDeleteAccount = new JPanel();
+		panelAccountInfo.add(panelDeleteAccount);
+		
+		JButton btnDeleteAccount = new JButton("Eliminar Usuario");
+		btnDeleteAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
+		panelDeleteAccount.add(btnDeleteAccount);
+		btnDeleteAccount.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				deleteUser(textEmailInfo.getText());
+				update();
+				
+			}
+		});
 	}
 	
-	void update() {
-		/*
-		 * TODO Actualizar modelo de taba y contenido del panel de 
-		 * informacion cuando se selecciona una fila en la tabla
-		 */
+	private void update() {
+
+		DefaultTableModel myModel = (DefaultTableModel) table.getModel();
+		myModel.setRowCount(0);
+		List<UserData> users = getUsers();
+		for (UserData user : users) {
+			System.out.println(user.getLogin());
+			Object[] data = {
+				user.getLogin(),
+				user.getPassword(),
+				user.getName(),
+				user.getSurname(),
+				user.getRole(),
+			};
+
+			myModel.addRow(data);
+        }
+		revalidate();
+		repaint();
+
+	}
+
+	private void createUser(String email, String password, String name, String surname, Role role){
+
+		UserData user = new UserData();
+		user.setLogin(email);
+		user.setPassword(password);
+		user.setName(name);
+		user.setSurname(surname);
+		user.setRole(role);
+	
+		WebTarget registerUserWebTarget = webTarget.path("register");
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.post(Entity.entity(user, MediaType.APPLICATION_JSON));
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly registered");
+		}
+
+	}
+
+	private void updateUser(String email, String password, String name, String surname, Role role){
+
+		UserData user = new UserData();
+		user.setLogin(email);
+		user.setPassword(password);
+		user.setName(name);
+		user.setSurname(surname);
+		user.setRole(role);
+	
+		WebTarget registerUserWebTarget = webTarget.path(email + "/update");
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.put(Entity.entity(user, MediaType.APPLICATION_JSON));
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+	}
+
+	private void deleteUser(String email){
+	
+		WebTarget registerUserWebTarget = webTarget.path(email + "/delete");
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.delete();
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+	}
+
+	private List<UserData> getUsers(){
+
+		WebTarget registerUserWebTarget = webTarget.path("/users");
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.get();
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+		return Arrays.asList(response.readEntity(UserData[].class));
+	}
+
+	private UserData getUser(String email) {
+		WebTarget registerUserWebTarget = webTarget.path("/" + email);
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.get();
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+		return response.readEntity(UserData.class);
 	}
 
 }
