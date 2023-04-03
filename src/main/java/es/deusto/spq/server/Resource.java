@@ -1,6 +1,7 @@
 package es.deusto.spq.server;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
@@ -197,8 +198,8 @@ public class Resource {
 	@Path("/users")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers() {
-		List<User> users = null;
-		List<UserData> usersdat = null;
+		List<User> users = new ArrayList<>();
+		List<UserData> usersdat = new ArrayList<>();
 		try {
 			tx.begin();
 			logger.info("Creating query ...");
@@ -211,7 +212,7 @@ public class Resource {
 
 			if (users != null) {
 				for (User user : users) {
-					UserData usdat = null;
+					UserData usdat = new UserData();
 					usdat.setLogin(user.getLogin());
 					usdat.setName(user.getName());
 					usdat.setSurname(user.getSurname());
