@@ -186,6 +186,14 @@ public class WindowDashboard extends JFrame {
 		JButton btnEditAccount = new JButton("Editar Usuario");
 		btnEditAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
 		panelCreateEditAccountBtns.add(btnEditAccount);
+		btnEditAccount.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Llamar al endpoint EDIT para editar una cuenta
+				
+			}
+		});
 		btnCreateAccount.addActionListener(new ActionListener() {
 			
 			@Override
@@ -311,6 +319,14 @@ public class WindowDashboard extends JFrame {
 		JButton btnDeleteAccount = new JButton("Eliminar Usuario");
 		btnDeleteAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
 		panelDeleteAccount.add(btnDeleteAccount);
+		btnDeleteAccount.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Llamar al endpoint DELETE para eliminar una cuenta
+				
+			}
+		});
 	}
 	
 	void update() {
