@@ -67,8 +67,11 @@ public class Resource {
 		if (user != null) {
 			logger.info(" * Client login: {}", login);
 			UserData userData = new UserData();
-			userData.setLogin(login);
-			userData.setPassword(password);
+			userData.setLogin(user.getLogin());
+			userData.setPassword(user.getPassword());
+			userData.setName(user.getName());
+			userData.setSurname(user.getPassword());
+			userData.setRole(user.getRole());
 			return Response.ok(userData).build();
 		} else {
 			return Response.status(Status.BAD_REQUEST)
@@ -136,7 +139,7 @@ public class Resource {
 				logger.info("Password set user: {}", user);
 			} else {
 				logger.info("Creating user: {}", user);
-				user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname());
+				user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname(), userData.getRole());
 				pm.makePersistent(user);
 				logger.info("User created: {}", user);
 			}
