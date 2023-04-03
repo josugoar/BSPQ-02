@@ -24,6 +24,9 @@ class LoginClient extends JFrame implements ActionListener {
     final JTextField textField1, textField2;
 
     public LoginClient(String hostname, String port) {
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(500, 500);
+
         client = ClientBuilder.newClient();
         webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
 
