@@ -45,7 +45,6 @@ public class Resource {
 	@PUT
 	@Path("/{login}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateUser(@PathParam("login") String login, UserData userData) {
 		try {
 			tx.begin();
@@ -70,10 +69,14 @@ public class Resource {
 				user.setSurname(userData.getSurname());
 				logger.info("Surname set user: {}", user);
 
+				logger.info("Setting role user: {}", user);
+				user.setRole(userData.getRole());
+				logger.info("Role set user: {}", user);
+
 				logger.info("User updated: {}", user);
 
 				tx.commit();
-				return Response.status(Status.OK).entity(user).build();
+				return Response.status(Status.OK).build();
 			} else {
 				logger.info("The user does not exist");
 
@@ -89,13 +92,13 @@ public class Resource {
 
 	@DELETE
 	@Path("/{login}/delete")
-	public Response deleteUser(@PathParam("login") String login, UserData userData) {
+	public Response deleteUser(@PathParam("login") String login) {
 		try {
 			tx.begin();
-			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
+			logger.info("Checking whether the user already exists or not: '{}'", login);
 			User user = null;
 			try {
-				user = pm.getObjectById(User.class, userData.getLogin());
+				user = pm.getObjectById(User.class, login);
 			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
 				logger.info("Exception launched: {}", jonfe.getMessage());
 			}
@@ -163,13 +166,13 @@ public class Resource {
 	@GET
 	@Path("/{login}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(@PathParam("login") String login, UserData userData) {
+	public Response getUser(@PathParam("login") String login) {
 		try {
 			tx.begin();
-			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
+			logger.info("Checking whether the user already exists or not: '{}'", login);
 			User user = null;
 			try {
-				user = pm.getObjectById(User.class, userData.getLogin());
+				user = pm.getObjectById(User.class, login);
 			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
 				logger.info("Exception launched: {}", jonfe.getMessage());
 			}
@@ -195,6 +198,7 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers() {
 		List<User> users = null;
+		List<UserData> usersdat = null;
 		try {
 			tx.begin();
 			logger.info("Creating query ...");
@@ -206,8 +210,17 @@ public class Resource {
 			}
 
 			if (users != null) {
+				for (User user : users) {
+					UserData usdat = null;
+					usdat.setLogin(user.getLogin());
+					usdat.setName(user.getName());
+					usdat.setSurname(user.getSurname());
+					usdat.setRole(user.getRole());
+					usersdat.add(usdat);
+
+				}
 				tx.commit();
-				return Response.status(Status.OK).entity(users).build();
+				return Response.status(Status.OK).entity(usersdat).build();
 			} else {
 				logger.info("Users not found");
 
