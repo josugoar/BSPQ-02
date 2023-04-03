@@ -4,6 +4,9 @@ import java.util.Set;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PrimaryKey;
+
+import es.deusto.spq.pojo.Role;
+
 import javax.jdo.annotations.Join;
 import javax.jdo.annotations.Persistent;
 import java.util.HashSet;
@@ -15,16 +18,18 @@ public class User {
 	String password = null;
 	String name = null;
 	String surname = null;
+	Role role = null;
 
 	@Persistent(mappedBy = "user", dependentElement = "true")
 	@Join
 	Set<Message> messages = new HashSet<>();
 
-	public User(String login, String password, String name, String surname) {
+	public User(String login, String password, String name, String surname, Role role) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
 		this.surname = surname;
+		this.role = role;
 	}
 
 	public void addMessage(Message message) {
@@ -55,9 +60,25 @@ public class User {
 		this.password = password;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+
 	public Set<Message> getMessages() {
 		return this.messages;
 	}
+
+	public Role getRole() {
+        return this.role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
 	public String toString() {
 		StringBuilder messagesStr = new StringBuilder();
