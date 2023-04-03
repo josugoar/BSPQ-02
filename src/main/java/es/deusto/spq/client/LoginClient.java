@@ -77,5 +77,4 @@ class LoginClient extends JFrame implements ActionListener {
             userClient.setVisible(true);
         }
     }
-
 }
