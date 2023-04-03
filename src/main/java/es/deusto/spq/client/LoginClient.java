@@ -26,6 +26,10 @@ class LoginClient extends JFrame implements ActionListener {
     private String hostname, port;
 
     public LoginClient(String hostname, String port) {
+        
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setSize(500,300);
+
         this.hostname = hostname;
         this.port = port;
         client = ClientBuilder.newClient();
@@ -75,7 +79,7 @@ class LoginClient extends JFrame implements ActionListener {
             logger.info("User correctly logged in");
             UserData user = response.readEntity(UserData.class);
             if (user.getRole() == Role.STUDENT) {
-                UserClient userClient = new UserClient(response.readEntity(UserData.class));
+                UserClient userClient = new UserClient(user);
                 setVisible(false);
                 userClient.setVisible(true);
             } else {
