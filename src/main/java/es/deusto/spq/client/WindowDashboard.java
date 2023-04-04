@@ -118,8 +118,8 @@ public class WindowDashboard extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Ocultar o cerrar el panel de admin y volver a Login
-				
+				dispose();
+				System.exit(0);			
 			}
 		});
 		
