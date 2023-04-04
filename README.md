@@ -11,6 +11,11 @@ Make sure that the database was correctly configured. Use the contents of the fi
 
       mysql -p --user root < sql/create-learnify.sql
 
+Alternatively, on Windows, enter MySQL shell with Root with the following command
+
+      mysql -u root -p
+      source sql/create-learnify.sql
+
 Run the following command to create database schema for this sample.
 
       mvn datanucleus:schema-create
@@ -18,6 +23,11 @@ Run the following command to create database schema for this sample.
 Run the following command to create an admin account.
 
       mysql -p --user root < sql/create-admin.sql
+
+On Windows:
+
+      mysql -u root -p
+      source sql/create-admin.sql      
 
 To launch the server run the command
 

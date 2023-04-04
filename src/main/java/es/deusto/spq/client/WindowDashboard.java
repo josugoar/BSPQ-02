@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import javax.jdo.listener.DeleteLifecycleListener;
@@ -117,8 +118,8 @@ public class WindowDashboard extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Ocultar o cerrar el panel de admin y volver a Login
-				
+				dispose();
+				System.exit(0);			
 			}
 		});
 		
@@ -159,7 +160,7 @@ public class WindowDashboard extends JFrame {
 		JLabel lblPassword = new JLabel("Contraseña");
 		panePassword.add(lblPassword);
 		
-		textPassword = new JTextField();
+		textPassword = new JPasswordField();
 		textPassword.setColumns(30);
 		panePassword.add(textPassword);
 		
@@ -346,7 +347,7 @@ public class WindowDashboard extends JFrame {
 		JLabel lblPasswordInfo = new JLabel("Contraseña");
 		panelPasswordInfo.add(lblPasswordInfo);
 		
-		textPasswordInfo = new JTextField();
+		textPasswordInfo = new JPasswordField();
 		textPasswordInfo.setEditable(false);
 		textPasswordInfo.setColumns(44);
 		panelPasswordInfo.add(textPasswordInfo);
