@@ -1,20 +1,25 @@
 Learnify
-============================
+========
 
-This project relies on the DataNucleus Maven plugin. Check the database configuration in the *datanucleus.properties* file and the JDBC driver dependency specified in the *pom.xml* file. In addition, the project contains the server and client codes.
+Run the following command to compile all classes and launch the unit tests:
 
-Run the following command to build everything and enhance the DB classes:
-
-      mvn clean compile
+      mvn test
 
 Make sure that the database was correctly configured. Use the contents of the file *create-learnify.sql* to create the database and grant privileges. For example,
 
-      mysql -p --user root < sql/create-learnify.sql
+      mysql –uroot -p < sql/create-learnify.sql
 
-Alternatively, on Windows, enter MySQL shell with Root with the following command
+Alternatively, on Windows, enter MySQL shell with root with the following command
 
       mysql -u root -p
       source sql/create-learnify.sql
+
+The class enhancement required by DataNucleus must be manually executed after the unit testing is performed.
+This is required to avoid cluttering the JaCoCo report with all the methods generated automatically by DataNucleus.
+
+Therefore, execute the following command to enhance the database classes
+
+      mvn datanucleus:enhance
 
 Run the following command to create database schema for this sample.
 
@@ -27,12 +32,22 @@ Run the following command to create an admin account.
 On Windows:
 
       mysql -u root -p
-      source sql/create-admin.sql      
+      source sql/create-admin.sql     
+
+Integration tests can be launched using the following command. An embedded Grizzly HTTP server will be launched to perform real calls
+to the REST API and to the MySQL database.
+
+      mvn verify -Pintegration-tests
+
+Performance tests can be launched using the following command. In this example, these tests are the same integration tests but executed
+multiple times to calculate some statistics
+
+      mvn verify -Pperformance-tests
 
 To launch the server run the command
 
       mvn jetty:run
 
 Now, the client sample code can be executed in a new command window with
-
+      
       mvn exec:java -Pclient
