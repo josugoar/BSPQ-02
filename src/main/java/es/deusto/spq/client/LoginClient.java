@@ -85,7 +85,7 @@ class LoginClient extends JFrame implements ActionListener {
                     break;
                 
                 case ADMIN:
-                    AdminClient dashboard = new AdminClient(hostname, port);
+                    AdminClient dashboard = new AdminClient(user, hostname, port);
                     setVisible(false);
                     dashboard.setVisible(rootPaneCheckingEnabled);
                     break;
