@@ -248,12 +248,7 @@ public class Resource {
 
 		if (user != null) {
 			logger.info(" * Client login: {}", login);
-			UserData userData = new UserData();
-			userData.setLogin(user.getLogin());
-			userData.setPassword(user.getPassword());
-			userData.setName(user.getName());
-			userData.setSurname(user.getPassword());
-			userData.setRole(user.getRole());
+			UserData userData = new UserData(user);
 			return Response.ok(userData).build();
 		} else {
 			return Response.status(Status.BAD_REQUEST)
@@ -293,12 +288,7 @@ public class Resource {
 			}
 			logger.info("User: {}", user);
 			if (user != null) {
-				UserData userData = new UserData();
-				userData.setLogin(user.getLogin());
-				userData.setPassword(user.getPassword());
-				userData.setName(user.getName());
-				userData.setSurname(user.getPassword());
-				userData.setRole(user.getRole());
+				UserData userData = new UserData(user);
 				tx.commit();
 				return Response.status(Status.OK).entity(userData).build();
 			} else {
@@ -346,11 +336,7 @@ public class Resource {
 			
 			if (users != null) {
 				for (User user : users) {
-					UserData usdat = new UserData();
-					usdat.setLogin(user.getLogin());
-					usdat.setName(user.getName());
-					usdat.setSurname(user.getSurname());
-					usdat.setRole(user.getRole());
+					UserData usdat = new UserData(user);
 					usersdat.add(usdat);
 				}
 				try {
