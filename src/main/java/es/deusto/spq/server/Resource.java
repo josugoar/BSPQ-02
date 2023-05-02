@@ -11,6 +11,8 @@ import javax.jdo.Transaction;
 
 import es.deusto.spq.server.jdo.User;
 import es.deusto.spq.pojo.Role;
+import es.deusto.spq.pojo.ScoreData;
+import es.deusto.spq.pojo.SubjectData;
 import es.deusto.spq.pojo.UserData;
 
 import javax.ws.rs.GET;
@@ -282,8 +284,6 @@ public class Resource {
 		}
 	}
 
-
-
 	@PUT
 	@Path("/users/{login}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -398,4 +398,72 @@ public class Resource {
 			}
 		}
 	}
+
+	@GET
+	@Path("/subjects")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSubject(@QueryParam("login") String logIn, @QueryParam("password") String password) {
+		return null;
+
+	}
+
+	@POST
+	@Path("/subjects")
+	public Response registerSubject(SubjectData subjectData) {
+		return null;
+	}
+
+	@GET
+	@Path("/subjects/{id}/get")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
+		return null;
+	}
+
+	@PUT
+	@Path("/subjects/{id}/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, SubjectData subjectData) {
+		return null;
+	}
+
+	@DELETE
+	@Path("/subjects/{id}/delete")
+	public Response deleteSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
+		return null;
+	}
+
+	@GET
+	@Path("/scores")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getScore(@QueryParam("login") String logIn, @QueryParam("password") String password) {
+		return null;
+	}
+
+	@POST
+	@Path("/scores")
+	public Response registerScore(ScoreData scoreData) {
+		return null;
+	}
+
+	@GET
+	@Path("/scores/{id}/get")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
+		return null;
+	}
+
+	@PUT
+	@Path("/scores/{id}/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, ScoreData scoreData) {
+		return null;
+	}
+
+	@DELETE
+	@Path("/scores/{id}/delete")
+	public Response deleteScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
+		return null;
+	}
+
 }
