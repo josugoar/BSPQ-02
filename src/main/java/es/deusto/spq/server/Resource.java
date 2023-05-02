@@ -282,8 +282,6 @@ public class Resource {
 		}
 	}
 
-
-
 	@PUT
 	@Path("/users/{login}/update")
 	@Consumes(MediaType.APPLICATION_JSON)

@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class ScoreClient extends JFrame {
+public class ProfessorClient extends JFrame {
 	private JPanel contentPane;
 	private JTextField textID;
 	private JTextField textScore;
@@ -41,9 +41,10 @@ public class ScoreClient extends JFrame {
     private Client client;
 	private WebTarget webTarget;
     protected static final Logger logger = LogManager.getLogger();
+	private UserData user;
 
-    public ScoreClient(String hostname, String port) {
-        
+    public ProfessorClient(UserData user, String hostname, String port) {
+		this.user = user;
         client = ClientBuilder.newClient();
 		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
 
@@ -204,9 +205,6 @@ public class ScoreClient extends JFrame {
 		btnChangeSubject.setFont(new Font("Tahoma", Font.BOLD, 12));
 		panelChangeSubject.add(btnChangeSubject);
 
-
-
-
         btnLogout.addActionListener(new ActionListener() {
 			
 			@Override
@@ -236,7 +234,6 @@ public class ScoreClient extends JFrame {
 		});
     }
 
-
     private void updateUserScore(Integer id, Float Score, SubjectData subject){
 
         UserData student = new UserData();
@@ -246,7 +243,8 @@ public class ScoreClient extends JFrame {
         scoData.setStudent(student);
         scoData.setSubject(subject);
 	
-		WebTarget registerUserWebTarget = webTarget.path(textID + "/update");
+		WebTarget registerUserWebTarget = webTarget.path("/scores" + textID.getText() + "/update")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.put(Entity.entity(scoData, MediaType.APPLICATION_JSON));
