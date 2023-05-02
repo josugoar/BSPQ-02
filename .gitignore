@@ -2,7 +2,9 @@ target/
 *.log
 
 .vscode/*
-
+.settings/
+.classPath
+.project
 # Local History for Visual Studio Code
 .history/
 
