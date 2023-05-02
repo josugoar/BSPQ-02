@@ -114,7 +114,7 @@ public class ScoreWindow extends JFrame {
 		JLabel lblScore = new JLabel("Nota");
 		panelScore.add(lblScore);
 		
-		textScore = new JPasswordField();
+		textScore = new JTextField();
 		textScore.setColumns(30);
 		panelScore.add(textScore);
 		
@@ -133,21 +133,21 @@ public class ScoreWindow extends JFrame {
 		panelLeft.add(panelCreateEditAccountBtns);
 		panelCreateEditAccountBtns.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JButton btnCreateAccount = new JButton("Guardar");
-		btnCreateAccount.addActionListener(new ActionListener() {
+		JButton btnSaveScore = new JButton("Guardar");
+		btnSaveScore.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnCreateAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
-		panelCreateEditAccountBtns.add(btnCreateAccount);
+		btnSaveScore.setFont(new Font("Tahoma", Font.BOLD, 12));
+		panelCreateEditAccountBtns.add(btnSaveScore);
 		
-		JButton btnEditAccount = new JButton("Cancelar");
-		btnEditAccount.addActionListener(new ActionListener() {
+		JButton btnCancel = new JButton("Cancelar");
+		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnEditAccount.setFont(new Font("Tahoma", Font.BOLD, 12));
-		panelCreateEditAccountBtns.add(btnEditAccount);
+		btnCancel.setFont(new Font("Tahoma", Font.BOLD, 12));
+		panelCreateEditAccountBtns.add(btnCancel);
 		
 		
 		
@@ -218,13 +218,22 @@ public class ScoreWindow extends JFrame {
 			}
 		});
 
-        btnEditAccount.addActionListener(new ActionListener() {
+        btnSaveScore.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateUserScore(Integer.parseInt(textID.getText()), 
 				Float.parseFloat(textScore.getText()), 
                 (SubjectData)subjectComboBox.getSelectedItem());
+			}
+		});
+
+		btnCancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textID.setText("");
+				textScore.setText("");
 			}
 		});
     }
