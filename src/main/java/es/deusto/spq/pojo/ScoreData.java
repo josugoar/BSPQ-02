@@ -1,13 +1,19 @@
 package es.deusto.spq.pojo;
 
+import es.deusto.spq.server.jdo.Score;
+
 public class ScoreData {
     private SubjectData subject;
     private UserData student;
     private Float score;
     private Integer id;
 
-    public ScoreData() {
+    public ScoreData(Score score) {
         // required for serialization
+        this.subject = new SubjectData(score.getSubject());
+        this.student = new UserData(score.getStudent());
+        this.score = score.getScore();
+        this.id = score.getId();
     }
 
     public SubjectData getSubject() {
