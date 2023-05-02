@@ -2,7 +2,6 @@ package es.deusto.spq.client;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import javax.swing.BoxLayout;
@@ -26,7 +25,6 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.UserData;
 import es.deusto.spq.pojo.SubjectData;
@@ -124,7 +122,7 @@ public class ScoreWindow extends JFrame {
 		JLabel lblName = new JLabel("Asignatura");
 		panelName.add(lblName);
 		
-		JComboBox subjectComboBox = new JComboBox();
+		JComboBox<SubjectData> subjectComboBox = new JComboBox<>();
 		panelName.add(subjectComboBox);
 		
 		
@@ -178,10 +176,10 @@ public class ScoreWindow extends JFrame {
 				"Email", "Nombre", "Calificacion", "Asignatura"
 			}
 		) {
-			Class[] columnTypes = new Class[] {
+			Class<?>[] columnTypes = new Class[] {
 				String.class, String.class, String.class, String.class
 			};
-			public Class getColumnClass(int columnIndex) {
+			public Class<?> getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 			boolean[] columnEditables = new boolean[] {

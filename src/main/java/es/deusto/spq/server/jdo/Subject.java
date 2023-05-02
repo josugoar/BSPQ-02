@@ -14,17 +14,12 @@ public class Subject {
     @PrimaryKey
     private Integer id = null;
 
-
-    
-
-
     public Subject(Date startDate, String name, User professor, Integer id) {
         this.startDate = startDate;
         this.name = name;
         this.professor = professor;
         this.id = id;
     }
-
 
     public Date getStartDate() {
         return startDate;
@@ -55,8 +50,5 @@ public class Subject {
 		return "Subject: name --> " + this.name + ", start date --> " + this.startDate + ", professor name -->" + this.professor.getName()
 				+ ", professor surname -->" + this.professor.getSurname() +", id -->  " + this.id + "]";
 	}
-
-
-    
 
 }
