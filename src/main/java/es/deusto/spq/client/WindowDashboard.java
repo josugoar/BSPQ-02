@@ -1,18 +1,14 @@
 package es.deusto.spq.client;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
-import javax.jdo.listener.DeleteLifecycleListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import java.awt.Font;
 
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -34,7 +30,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,7 +37,6 @@ import javax.swing.DefaultComboBoxModel;
 
 import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.UserData;
-import es.deusto.spq.server.jdo.User;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -190,8 +184,8 @@ public class WindowDashboard extends JFrame {
 		JLabel lblAccountType = new JLabel("Tipo de Usuario");
 		panelAccountType.add(lblAccountType);
 		
-		JComboBox comboAccountType = new JComboBox();
-		comboAccountType.setModel(new DefaultComboBoxModel(Role.values()));
+		JComboBox<Role> comboAccountType = new JComboBox<>();
+		comboAccountType.setModel(new DefaultComboBoxModel<Role>(Role.values()));
 		panelAccountType.add(comboAccountType);
 		
 		JPanel panelCreateEditAccountBtns = new JPanel();
@@ -263,10 +257,10 @@ public class WindowDashboard extends JFrame {
 				"Email", "Contrase\u00F1a", "Nombre", "Apellidos", "Tipo"
 			}
 		) {
-			Class[] columnTypes = new Class[] {
+			Class<?>[] columnTypes = new Class[] {
 				String.class, String.class, String.class, String.class, Role.class
 			};
-			public Class getColumnClass(int columnIndex) {
+			public Class<?> getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 			boolean[] columnEditables = new boolean[] {
