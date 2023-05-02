@@ -1,5 +1,5 @@
 package es.deusto.spq.pojo;
 
-public class SubjectData {
+public class UserDataTest {
     
 }
