@@ -1,5 +1,7 @@
 package es.deusto.spq.pojo;
 
+import es.deusto.spq.server.jdo.User;
+
 public class UserData {
 
     private String login;
@@ -8,8 +10,12 @@ public class UserData {
     private String surname;
     private Role role;
 
-    public UserData() {
+    public UserData(User user) {
         // required by serialization
+        this.setLogin(user.getLogin());
+        this.setName(user.getName());
+        this.setSurname(user.getSurname());
+        this.setRole(user.getRole());
     }
 
     public String getName() {
