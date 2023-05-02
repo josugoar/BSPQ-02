@@ -109,18 +109,18 @@ public class Resource {
 	@PUT
 	@Path("/users/update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateUser(@QueryParam("login") String logIn, @QueryParam("password") String password, UserData userData) {
+	public Response updateUser(@QueryParam("login") String login, @QueryParam("password") String password, UserData userData) {
 		
 		Role[] roles = {Role.ADMIN};
 
-		if(authenticate(logIn, password)){
+		if(authenticate(login, password)){
 			logger.info("User authenticated");
 		} else {
 			logger.info("Authentication failed");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		if(authorize(logIn, roles)){
+		if(authorize(login, roles)){
 			logger.info("User authorized");
 		} else {
 			logger.info("Authorization failed");
