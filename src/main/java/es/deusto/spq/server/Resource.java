@@ -104,21 +104,58 @@ public class Resource {
 		}
 	}
 
-	@PUT
-	@Path("/users/update")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateUser(@QueryParam("login") String login, @QueryParam("password") String password, UserData userData) {
-		
+	@GET
+	@Path("/login")
+	public Response login(@QueryParam("login") String logIn, @QueryParam("password") String password) {
+		User user = null;
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			try (Query<?> q = pm.newQuery("SELECT FROM " + User.class.getName() + " WHERE login == \""
+					+ logIn + "\" &&  password == \""
+					+ password + "\"")) {
+				q.setUnique(true);
+				user = (User) q.execute();
+
+				logger.info("User retrieved: {}", user);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tx.commit();
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+
+		if (user != null) {
+			logger.info(" * Client login: {}", logIn);
+			UserData userData = new UserData(user);
+			return Response.ok(userData).build();
+		} else {
+			return Response.status(Status.BAD_REQUEST)
+					.entity("Login details supplied for message delivery are not correct").build();
+		}
+	}
+
+	@GET
+	@Path("/users")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUsers(@QueryParam("login") String logIn, @QueryParam("password") String password) {
+		List<User> users = null;
+		List<UserData> usersdat = new ArrayList<>();
+
 		Role[] roles = {Role.ADMIN};
 
-		if(authenticate(login, password)){
+		if(authenticate(logIn, password)){
 			logger.info("User authenticated");
 		} else {
 			logger.info("Authentication failed");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		if(authorize(login, roles)){
+		if(authorize(logIn, roles)){
 			logger.info("User authorized");
 		} else {
 			logger.info("Authorization failed");
@@ -127,10 +164,153 @@ public class Resource {
 
 		try {
 			tx.begin();
+			logger.info("Creating query ...");
+
+			Query<User> q = pm.newQuery(User.class);
+			users = q.executeList();
+			
+			if (users != null) {
+				for (User user : users) {
+					UserData usdat = new UserData(user);
+					usersdat.add(usdat);
+				}
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.OK).entity(usersdat.toArray(new UserData[0])).build();
+			} else {
+				logger.info("Users not found");
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+	}
+
+	@POST
+	@Path("/users")
+	public Response registerUser(UserData userData) {
+		try {
+			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
 			User user = null;
 			try {
 				user = pm.getObjectById(User.class, userData.getLogin());
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("User: {}", user);
+			if (user != null) {
+				logger.info("The user already exists");
+
+				tx.commit();
+				return Response.status(Status.BAD_REQUEST).build();
+			} else {
+				logger.info("Creating user: {}", user);
+				user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname(),
+						userData.getRole());
+				pm.makePersistent(user);
+				logger.info("User created: {}", user);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+
+		}
+	}
+
+	@GET
+	@Path("/users/{login}/get")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
+
+		Role[] roles = {Role.ADMIN, Role.DEAN, Role.PROFESSOR};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the user already exists or not: '{}'", login);
+			User user = null;
+			try {
+				user = pm.getObjectById(User.class, login);
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("User: {}", user);
+			if (user != null) {
+				UserData userData = new UserData(user);
+				tx.commit();
+				return Response.status(Status.OK).entity(userData).build();
+			} else {
+				logger.info("The user does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+	}
+
+
+
+	@PUT
+	@Path("/users/{login}/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login, UserData userData) {
+		
+		Role[] roles = {Role.ADMIN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the user already exists or not: '{}'", login);
+			User user = null;
+			try {
+				user = pm.getObjectById(User.class, login);
 			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
 				logger.info("Exception launched: {}", jonfe.getMessage());
 			}
@@ -216,184 +396,6 @@ public class Resource {
 			if (tx.isActive()) {
 				tx.rollback();
 			}
-		}
-	}
-
-	@GET
-	@Path("/login")
-	public Response login(@QueryParam("login") String login, @QueryParam("password") String password) {
-		User user = null;
-		try {
-			tx.begin();
-			logger.info("Creating query ...");
-
-			try (Query<?> q = pm.newQuery("SELECT FROM " + User.class.getName() + " WHERE login == \""
-					+ login + "\" &&  password == \""
-					+ password + "\"")) {
-				q.setUnique(true);
-				user = (User) q.execute();
-
-				logger.info("User retrieved: {}", user);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			tx.commit();
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
-		}
-
-		if (user != null) {
-			logger.info(" * Client login: {}", login);
-			UserData userData = new UserData(user);
-			return Response.ok(userData).build();
-		} else {
-			return Response.status(Status.BAD_REQUEST)
-					.entity("Login details supplied for message delivery are not correct").build();
-		}
-	}
-
-	@GET
-	@Path("/users/{login}/get")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
-
-		Role[] roles = {Role.ADMIN, Role.DEAN, Role.PROFESSOR};
-
-		if(authenticate(logIn, password)){
-			logger.info("User authenticated");
-		} else {
-			logger.info("Authentication failed");
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-
-		if(authorize(logIn, roles)){
-			logger.info("User authorized");
-		} else {
-			logger.info("Authorization failed");
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-
-		try {
-			tx.begin();
-			logger.info("Checking whether the user already exists or not: '{}'", login);
-			User user = null;
-			try {
-				user = pm.getObjectById(User.class, login);
-			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
-				logger.info("Exception launched: {}", jonfe.getMessage());
-			}
-			logger.info("User: {}", user);
-			if (user != null) {
-				UserData userData = new UserData(user);
-				tx.commit();
-				return Response.status(Status.OK).entity(userData).build();
-			} else {
-				logger.info("The user does not exist");
-
-				tx.commit();
-				return Response.status(Status.NOT_FOUND).build();
-			}
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
-		}
-	}
-
-	@GET
-	@Path("/users")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUsers(@QueryParam("login") String login, @QueryParam("password") String password) {
-		List<User> users = null;
-		List<UserData> usersdat = new ArrayList<>();
-
-		Role[] roles = {Role.ADMIN};
-
-		if(authenticate(login, password)){
-			logger.info("User authenticated");
-		} else {
-			logger.info("Authentication failed");
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-
-		if(authorize(login, roles)){
-			logger.info("User authorized");
-		} else {
-			logger.info("Authorization failed");
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-
-		try {
-			tx.begin();
-			logger.info("Creating query ...");
-
-			Query<User> q = pm.newQuery(User.class);
-			users = q.executeList();
-			
-			if (users != null) {
-				for (User user : users) {
-					UserData usdat = new UserData(user);
-					usersdat.add(usdat);
-				}
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.OK).entity(usersdat.toArray(new UserData[0])).build();
-			} else {
-				logger.info("Users not found");
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.NOT_FOUND).build();
-			}
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
-		}
-	}
-
-	@POST
-	@Path("/register")
-	public Response registerUser(UserData userData) {
-		try {
-			tx.begin();
-			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
-			User user = null;
-			try {
-				user = pm.getObjectById(User.class, userData.getLogin());
-			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
-				logger.info("Exception launched: {}", jonfe.getMessage());
-			}
-			logger.info("User: {}", user);
-			if (user != null) {
-				logger.info("The user already exists");
-
-				tx.commit();
-				return Response.status(Status.BAD_REQUEST).build();
-			} else {
-				logger.info("Creating user: {}", user);
-				user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname(),
-						userData.getRole());
-				pm.makePersistent(user);
-				logger.info("User created: {}", user);
-
-				tx.commit();
-				return Response.status(Status.OK).build();
-			}
-		} finally {
-			if (tx.isActive()) {
-				tx.rollback();
-			}
-
 		}
 	}
 }

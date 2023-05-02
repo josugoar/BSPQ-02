@@ -15,7 +15,6 @@ import java.awt.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.UserData;
 
 class LoginClient extends JFrame implements ActionListener {
@@ -78,14 +77,30 @@ class LoginClient extends JFrame implements ActionListener {
         } else {
             logger.info("User correctly logged in");
             UserData user = response.readEntity(UserData.class);
-            if (user.getRole() == Role.STUDENT) {
-                UserClient userClient = new UserClient(user);
-                setVisible(false);
-                userClient.setVisible(true);
-            } else {
-                WindowDashboard dashboard = new WindowDashboard(hostname, port);
-                setVisible(false);
-                dashboard.setVisible(rootPaneCheckingEnabled);
+            switch (user.getRole()) {
+                case STUDENT:
+                    StudentClient userClient = new StudentClient(user);
+                    setVisible(false);
+                    userClient.setVisible(true);
+                    break;
+                
+                case ADMIN:
+                    AdminClient dashboard = new AdminClient(hostname, port);
+                    setVisible(false);
+                    dashboard.setVisible(rootPaneCheckingEnabled);
+                    break;
+                
+                case DEAN:
+                    // TODO
+                    break;
+
+                case PROFESSOR:
+                    // TODO
+                    break;
+            
+                default:
+                    logger.error("Unrecognized role");
+                    break;
             }
             
         }
