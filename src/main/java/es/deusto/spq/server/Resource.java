@@ -107,9 +107,9 @@ public class Resource {
 	}
 
 	@PUT
-	@Path("/{login}/update")
+	@Path("/users/update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login, UserData userData) {
+	public Response updateUser(@QueryParam("login") String logIn, @QueryParam("password") String password, UserData userData) {
 		
 		Role[] roles = {Role.ADMIN};
 
@@ -172,7 +172,7 @@ public class Resource {
 	}
 
 	@DELETE
-	@Path("/{login}/delete")
+	@Path("/users/{login}/delete")
 	public Response deleteUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
 		
 		Role[] roles = {Role.ADMIN};
@@ -262,7 +262,7 @@ public class Resource {
 	}
 
 	@GET
-	@Path("/{login}")
+	@Path("/users/{login}/get")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
 
