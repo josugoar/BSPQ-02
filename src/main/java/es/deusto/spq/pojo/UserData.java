@@ -15,6 +15,7 @@ public class UserData {
         this.setLogin(user.getLogin());
         this.setName(user.getName());
         this.setSurname(user.getSurname());
+        this.setPassword(user.getPassword());
         this.setRole(user.getRole());
     }
 
