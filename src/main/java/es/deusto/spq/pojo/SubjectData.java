@@ -2,6 +2,8 @@ package es.deusto.spq.pojo;
 
 import java.sql.Date;
 
+import es.deusto.spq.server.jdo.Subject;
+
 public class SubjectData {
     
     private Date startDate;
@@ -11,8 +13,12 @@ public class SubjectData {
 
 
     
-    public SubjectData() {
+    public SubjectData(Subject subject) {
         // required by serialization
+        this.startDate = subject.getStartDate();
+        this.name = subject.getName();
+        this.professor = new UserData(subject.getProfessor());
+        this.id = subject.getId();
     }
 
 
