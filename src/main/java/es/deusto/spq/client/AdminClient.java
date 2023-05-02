@@ -41,7 +41,7 @@ import es.deusto.spq.pojo.UserData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class WindowDashboard extends JFrame {
+public class AdminClient extends JFrame {
 
 	protected static final Logger logger = LogManager.getLogger();
 	private JPanel contentPane;
@@ -64,7 +64,7 @@ public class WindowDashboard extends JFrame {
 	 * Create the frame.
 	 */
 	
-	public WindowDashboard(String hostname, String port) {
+	public AdminClient(String hostname, String port) {
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 

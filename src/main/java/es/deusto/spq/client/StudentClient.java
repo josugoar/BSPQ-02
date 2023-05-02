@@ -7,9 +7,9 @@ import javax.swing.JPanel;
 
 import es.deusto.spq.pojo.UserData;
 
-public class UserClient extends JFrame {
+public class StudentClient extends JFrame {
 
-    public UserClient(UserData userData) {
+    public StudentClient(UserData userData) {
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(600,500);
