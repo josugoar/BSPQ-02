@@ -19,6 +19,10 @@ public class UserData {
         this.setRole(user.getRole());
     }
 
+    public UserData(){
+        
+    }
+
     public String getName() {
         return this.name;
     }

@@ -16,6 +16,10 @@ public class ScoreData {
         this.id = score.getId();
     }
 
+    public ScoreData(){
+        
+    }
+
     public SubjectData getSubject() {
         return subject;
     }

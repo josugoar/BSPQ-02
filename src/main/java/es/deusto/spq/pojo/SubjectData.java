@@ -21,6 +21,10 @@ public class SubjectData {
         this.id = subject.getId();
     }
 
+    public SubjectData(){
+        
+    }
+
 
     public Date getStartDate() {
         return startDate;
