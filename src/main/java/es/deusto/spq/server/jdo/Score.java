@@ -1,14 +1,16 @@
 package es.deusto.spq.server.jdo;
 
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable
 public class Score {
 
-    private Subject subject;
-    private User student;
-    private Float score;
-    private Integer id;
+    private Subject subject = null;
+    private User student = null;
+    private Float score = null;
+    @PrimaryKey
+    private Integer id = null;
 
     public Score(Subject subject, User student, Float score, Integer id) {
         this.subject = subject;
