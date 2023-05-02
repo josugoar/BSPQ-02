@@ -19,7 +19,7 @@ import es.deusto.spq.pojo.UserData;
 
 class LoginClient extends JFrame implements ActionListener {
     JButton b1;
-    JPanel newPanel;
+    JPanel panel, panel1, panel2, panel3;
     JLabel userLabel, passLabel;
     final JTextField textField1, textField2;
     private String hostname, port;
@@ -44,16 +44,27 @@ class LoginClient extends JFrame implements ActionListener {
 
         textField2 = new JPasswordField(15);
 
+        panel = new JPanel();
+        BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+        panel.setLayout(boxLayout);
+
+        panel1 = new JPanel();
+        panel1.add(userLabel);
+        panel1.add(textField1);
+
+        panel2 = new JPanel();
+        panel1.add(passLabel);
+        panel1.add(textField2);
+        
+        panel3 = new JPanel();
         b1 = new JButton("SUBMIT");
+        panel3.add(b1);
 
-        newPanel = new JPanel(new GridLayout(3, 1));
-        newPanel.add(userLabel);
-        newPanel.add(textField1);
-        newPanel.add(passLabel);
-        newPanel.add(textField2);
-        newPanel.add(b1);
+        panel.add(panel1);
+        panel.add(panel2);
+        panel.add(panel3);
 
-        add(newPanel, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER);
 
         b1.addActionListener(this);
         setTitle("LOGIN FORM");
