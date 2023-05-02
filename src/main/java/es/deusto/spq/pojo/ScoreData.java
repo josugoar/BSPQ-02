@@ -17,7 +17,6 @@ public class ScoreData {
     }
 
     public ScoreData(){
-        
     }
 
     public SubjectData getSubject() {
@@ -51,7 +50,6 @@ public class ScoreData {
     public void setId(Integer id) {
         this.id = id;
     }
-    
 
     public String toString() {
 		return "Score: user name --> " + this.student.getName() + ", user surname --> " + this.student.getSurname() + ", subject -->" + this.subject

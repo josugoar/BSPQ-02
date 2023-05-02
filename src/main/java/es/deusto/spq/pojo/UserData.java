@@ -20,7 +20,6 @@ public class UserData {
     }
 
     public UserData(){
-        
     }
 
     public String getName() {

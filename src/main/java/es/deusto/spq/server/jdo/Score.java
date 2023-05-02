@@ -49,7 +49,6 @@ public class Score {
         this.id = id;
     }
     
-
     public String toString() {
 		return "Score: user name --> " + this.student.getName() + ", user surname --> " + this.student.getSurname() + ", subject -->" + this.subject
 				+ ", score -->  " + this.score + "]";

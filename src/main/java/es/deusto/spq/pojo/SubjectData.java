@@ -11,8 +11,6 @@ public class SubjectData {
     private UserData professor;
     private Integer id;
 
-
-    
     public SubjectData(Subject subject) {
         // required by serialization
         this.startDate = subject.getStartDate();
@@ -22,9 +20,7 @@ public class SubjectData {
     }
 
     public SubjectData(){
-        
     }
-
 
     public Date getStartDate() {
         return startDate;
