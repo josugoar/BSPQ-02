@@ -1,7 +1,7 @@
 Learnify
 ============================
 
-This project relies on the DataNucleus Maven plugin. Check the database configuration in the *datanucleus.properties* file and the JDBC driver dependency specified in the *pom.xml* file. In addition, the project contains the server and client example codes.
+This project relies on the DataNucleus Maven plugin. Check the database configuration in the *datanucleus.properties* file and the JDBC driver dependency specified in the *pom.xml* file. In addition, the project contains the server and client codes.
 
 Run the following command to build everything and enhance the DB classes:
 
