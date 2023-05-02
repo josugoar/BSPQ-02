@@ -17,7 +17,7 @@
 		<jersey.version>2.35</jersey.version>
 		<server.hostname>127.0.0.1</server.hostname>
 		<server.port>8080</server.port>
-		<sonar.organization>learnify</sonar.organization>
+		<sonar.organization>Learnify</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
