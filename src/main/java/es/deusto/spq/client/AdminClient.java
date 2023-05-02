@@ -59,13 +59,14 @@ public class AdminClient extends JFrame {
 
 	private Client client;
 	private WebTarget webTarget;
+	private UserData user;
 
 	/**
 	 * Create the frame.
 	 */
 	
-	public AdminClient(String hostname, String port) {
-
+	public AdminClient(UserData user, String hostname, String port) {
+		this.user = user;
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		client = ClientBuilder.newClient();
@@ -406,7 +407,8 @@ public class AdminClient extends JFrame {
 		user.setSurname(surname);
 		user.setRole(role);
 	
-		WebTarget registerUserWebTarget = webTarget.path("register");
+		WebTarget registerUserWebTarget = webTarget.path("users")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.post(Entity.entity(user, MediaType.APPLICATION_JSON));
@@ -427,7 +429,8 @@ public class AdminClient extends JFrame {
 		user.setSurname(surname);
 		user.setRole(role);
 	
-		WebTarget registerUserWebTarget = webTarget.path(email + "/update");
+		WebTarget registerUserWebTarget = webTarget.path("users/" + email + "/update")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.put(Entity.entity(user, MediaType.APPLICATION_JSON));
@@ -440,7 +443,8 @@ public class AdminClient extends JFrame {
 
 	private void deleteUser(String email){
 	
-		WebTarget registerUserWebTarget = webTarget.path(email + "/delete");
+		WebTarget registerUserWebTarget = webTarget.path("users/" + email + "/delete")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.delete();
@@ -453,7 +457,8 @@ public class AdminClient extends JFrame {
 
 	private List<UserData> getUsers(){
 
-		WebTarget registerUserWebTarget = webTarget.path("/users");
+		WebTarget registerUserWebTarget = webTarget.path("users")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.get();
@@ -466,7 +471,8 @@ public class AdminClient extends JFrame {
 	}
 
 	private UserData getUser(String email) {
-		WebTarget registerUserWebTarget = webTarget.path("/" + email);
+		WebTarget registerUserWebTarget = webTarget.path(email)
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.get();
