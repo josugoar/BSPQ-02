@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class ScoreWindow extends JFrame {
+public class ScoreClient extends JFrame {
 	private JPanel contentPane;
 	private JTextField textID;
 	private JTextField textScore;
@@ -42,7 +42,7 @@ public class ScoreWindow extends JFrame {
 	private WebTarget webTarget;
     protected static final Logger logger = LogManager.getLogger();
 
-    public ScoreWindow(String hostname, String port) {
+    public ScoreClient(String hostname, String port) {
         
         client = ClientBuilder.newClient();
 		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
