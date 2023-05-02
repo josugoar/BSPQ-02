@@ -1,10 +1,7 @@
 package es.deusto.spq.server.jdo;
-
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import es.deusto.spq.pojo.Role;
 
 public class UserTest {
@@ -77,11 +74,6 @@ public class UserTest {
         String result = "User: name --> " + "name" + ", surname --> " + "surname" + ", login -->" + "test-login"
         + ", password -->  " + "password" + "]";
 
-        assertEquals(result,user.toString());
-        
-        
+        assertEquals(result,user.toString());   
     }
-
-
-    
 }
