@@ -10,6 +10,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.Transaction;
 
 import es.deusto.spq.server.jdo.User;
+import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.UserData;
 
 import javax.ws.rs.GET;
@@ -45,10 +46,87 @@ public class Resource {
 		this.tx = pm.currentTransaction();
 	}
 
+	private boolean authenticate(String login, String password){
+		User user = null;
+		try {
+			tx.begin();
+			logger.info("Checking whether the user exists or not: '{}'", login);
+			try {
+				user = pm.getObjectById(User.class, login);
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("User: {}", user);
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+		if(user!=null){
+			if (password.equals(user.getPassword())) {
+				return true;
+			} else {
+				logger.info("Password is not correct");
+				return false;
+			}
+		} else {
+			logger.info("The user does not exist");
+			return false;
+		}
+		
+	}
+
+	private boolean authorize(String login, Role[] roles){
+		User user = null;
+		try {
+			tx.begin();
+			logger.info("Checking whether the user exists or not: '{}'", login);
+			try {
+				user = pm.getObjectById(User.class, login);
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("User: {}", user);
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
+		if(user!=null){
+			for (int i = 0; i < roles.length; i++) {
+				if (roles[i].equals(user.getRole()) ) {
+					return true;
+				}
+			}
+			logger.info("Role no authorizated");
+			return false;
+		} else {
+			logger.info("The user does not exist");
+			return false;
+		}
+	}
+
 	@PUT
 	@Path("/{login}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateUser(@PathParam("login") String login, UserData userData) {
+	public Response updateUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login, UserData userData) {
+		
+		Role[] roles = {Role.ADMIN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
@@ -95,7 +173,24 @@ public class Resource {
 
 	@DELETE
 	@Path("/{login}/delete")
-	public Response deleteUser(@PathParam("login") String login) {
+	public Response deleteUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
+		
+		Role[] roles = {Role.ADMIN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", login);
@@ -169,7 +264,24 @@ public class Resource {
 	@GET
 	@Path("/{login}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(@PathParam("login") String login) {
+	public Response getUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
+
+		Role[] roles = {Role.ADMIN, Role.DEAN, Role.PROFESSOR};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", login);
@@ -205,9 +317,26 @@ public class Resource {
 	@GET
 	@Path("/users")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUsers() {
+	public Response getUsers(@QueryParam("login") String login, @QueryParam("password") String password) {
 		List<User> users = null;
 		List<UserData> usersdat = new ArrayList<>();
+
+		Role[] roles = {Role.ADMIN};
+
+		if(authenticate(login, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(login, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
 		try {
 			tx.begin();
 			logger.info("Creating query ...");
