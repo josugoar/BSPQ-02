@@ -25,8 +25,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import es.deusto.spq.pojo.Role;
+import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.SubjectData;
 import es.deusto.spq.pojo.UserData;
+import es.deusto.spq.server.jdo.Score;
 import es.deusto.spq.server.jdo.Subject;
 import es.deusto.spq.server.jdo.User;
 
@@ -46,6 +48,9 @@ public class ResourceTest {
 
     @Mock
     private Query<Subject> querySubject;
+
+    @Mock
+    private Query<Score> queryScore;
 
     @Before
     public void setUp() {
