@@ -9,6 +9,7 @@ import javax.jdo.Query;
 import javax.jdo.JDOHelper;
 import javax.jdo.Transaction;
 
+import es.deusto.spq.server.jdo.Score;
 import es.deusto.spq.server.jdo.User;
 import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.ScoreData;
@@ -437,7 +438,82 @@ public class Resource {
 	@Path("/scores")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScore(@QueryParam("login") String logIn, @QueryParam("password") String password) {
-		return null;
+		List<Score> scores = null;
+		List<ScoreData> scoresdata = new ArrayList<>();
+
+		Role[] roles = {Role.DEAN, Role.PROFESSOR, Role.STUDENT};
+
+		User user = null;
+			try {
+				user = pm.getObjectById(User.class, logIn);
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			Query<Score> q = pm.newQuery(Score.class);
+			scores = q.executeList();
+			
+			if (scores != null) {
+				for (Score score : scores) {
+					ScoreData scoredat = new ScoreData(score);
+					switch (user.getRole()) {
+						case STUDENT:
+							if (score.getStudent().equals(user)) {
+								scoresdata.add(scoredat);
+							}
+							break;
+						case PROFESSOR:
+							if (score.getSubject().getProfessor().equals(user)) {
+								scoresdata.add(scoredat);
+							}
+							break;
+						case DEAN:
+							scoresdata.add(scoredat);
+							break;
+						default:
+							break;
+					}
+				}
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.OK).entity(scoresdata.toArray(new ScoreData[0])).build();
+			} else {
+				logger.info("Scores not found");
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 	@POST
