@@ -92,7 +92,7 @@ class LoginClient extends JFrame implements ActionListener {
             UserData user = response.readEntity(UserData.class);
             switch (user.getRole()) {
                 case STUDENT:
-                    StudentClient userClient = new StudentClient(user);
+                    StudentClient userClient = new StudentClient(user, hostname, port);
                     setVisible(false);
                     userClient.setVisible(true);
                     break;
