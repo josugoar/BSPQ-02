@@ -46,6 +46,7 @@ public class ProffessorClient extends JFrame {
 	private WebTarget webTarget;
     protected static final Logger logger = LogManager.getLogger();
 	private UserData user;
+	private ScoreData score;
 
     public ProffessorClient(UserData user, String hostname, String port) {
 		this.user = user;
@@ -127,9 +128,9 @@ public class ProffessorClient extends JFrame {
 		JLabel lblName = new JLabel("Asignatura");
 		panelName.add(lblName);
 		
-		JComboBox<SubjectData> subjectComboBox = new JComboBox<>();
+		JComboBox<String> subjectComboBox = new JComboBox<>();
 		panelName.add(subjectComboBox);
-		
+		subjectComboBox.addItem("sistemas");
 		
 		JPanel panelCreateEditAccountBtns = new JPanel();
 		panelCreateEditAccountBtns.setBorder(UIManager.getBorder("DesktopIcon.border"));
@@ -225,7 +226,6 @@ public class ProffessorClient extends JFrame {
 				updateScore(Integer.parseInt(textID.getText()), 
 				Float.parseFloat(textScore.getText()), 
                 (SubjectData)subjectComboBox.getSelectedItem());
-
 				update();
 			}
 		});
@@ -239,27 +239,6 @@ public class ProffessorClient extends JFrame {
 			}
 		});
     }
-
-    private void updateScore(Integer id, Float Score, SubjectData subject){
-
-        UserData student = new UserData();
-		ScoreData scoData = new ScoreData();
-        scoData.setId(id);
-        scoData.setScore(Score);
-        scoData.setStudent(student);
-        scoData.setSubject(subject);
-	
-		WebTarget registerUserWebTarget = webTarget.path("/scores" + textID.getText() + "/update")
-			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
-		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
-
-		Response response = invocationBuilder.put(Entity.entity(scoData, MediaType.APPLICATION_JSON));
-		if (response.getStatus() != Status.OK.getStatusCode()) {
-			logger.error("Error connecting with the server. Code: {}", response.getStatus());
-		} else {
-			logger.info("User correctly updated");
-		}
-	}
 
 	private void update() {
 
@@ -282,48 +261,54 @@ public class ProffessorClient extends JFrame {
 
 	}
 
+    private void updateScore(Integer id, Float Score, SubjectData subject){
+
+        UserData student = new UserData();
+		ScoreData scoData = new ScoreData();
+        scoData.setId(id);
+        scoData.setScore(Score);
+        scoData.setStudent(student);
+        scoData.setSubject(subject);
+	
+		WebTarget updateScoreWebTarget = webTarget.path("scores/" + textID.getText() + "/update")
+			.queryParam("login", student.getLogin()).queryParam("password", user.getPassword()).queryParam("0000", scoData.getId())
+			.queryParam("9", scoData.getScore());
+		Invocation.Builder invocationBuilder = updateScoreWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.put(Entity.entity(scoData, MediaType.APPLICATION_JSON));
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("Score correctly updated");
+		}
+	}
+
 	private void deleteScore(String email){
 	
-		WebTarget registerUserWebTarget = webTarget.path("users/" + email + "/delete")
-			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
-		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+		WebTarget deleteScoreWebTarget = webTarget.path("scores/" + textID.getText() + "/delete")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword()).queryParam("0000", score.getId());
+		Invocation.Builder invocationBuilder = deleteScoreWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.delete();
 		if (response.getStatus() != Status.OK.getStatusCode()) {
 			logger.error("Error connecting with the server. Code: {}", response.getStatus());
 		} else {
-			logger.info("User correctly updated");
+			logger.info("Score correctly deleted");
 		}
 	}
 
 	private List<ScoreData> getScores(){
 
-		WebTarget registerUserWebTarget = webTarget.path("users")
-			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
-		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+		WebTarget getScoresWebTarget = webTarget.path("scores/" + textID.getText() + "/get")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword()).queryParam("0000", score.getId());
+		Invocation.Builder invocationBuilder = getScoresWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.get();
 		if (response.getStatus() != Status.OK.getStatusCode()) {
 			logger.error("Error connecting with the server. Code: {}", response.getStatus());
 		} else {
-			logger.info("User correctly updated");
+			logger.info("Scores correctly listed");
 		}
 		return Arrays.asList(response.readEntity(ScoreData[].class));
 	}
-
-	/* 
-	private UserData getScore(String email) {
-		WebTarget registerUserWebTarget = webTarget.path(email)
-			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
-		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
-
-		Response response = invocationBuilder.get();
-		if (response.getStatus() != Status.OK.getStatusCode()) {
-			logger.error("Error connecting with the server. Code: {}", response.getStatus());
-		} else {
-			logger.info("User correctly updated");
-		}
-		return response.readEntity(UserData.class);
-	}
-	*/
 }
