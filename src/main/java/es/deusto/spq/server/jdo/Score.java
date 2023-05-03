@@ -39,7 +39,10 @@ public class Score {
         return score;
     }
 
-    public void setScore(Float score) {
+    public void setScore(Float score) throws IllegalArgumentException {
+        if (score < 0 || score > 10) {
+            throw new IllegalArgumentException("score < 0 || score > 10");
+        }
         this.score = score;
     }
 
