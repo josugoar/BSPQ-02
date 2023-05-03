@@ -14,6 +14,9 @@ public class Subject {
     @PrimaryKey
     private Integer id = null;
 
+    public Subject() {
+	}
+
     public Subject(Date startDate, String name, User professor, Integer id) {
         this.startDate = startDate;
         this.name = name;

@@ -12,6 +12,9 @@ public class Score {
     @PrimaryKey
     private Integer id = null;
 
+    public Score() {
+	}
+
     public Score(Subject subject, User student, Float score, Integer id) {
         this.subject = subject;
         this.student = student;
