@@ -10,6 +10,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.Transaction;
 
 import es.deusto.spq.server.jdo.Score;
+import es.deusto.spq.server.jdo.Subject;
 import es.deusto.spq.server.jdo.User;
 import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.ScoreData;
@@ -533,7 +534,64 @@ public class Resource {
 	@Path("/scores/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, ScoreData scoreData) {
-		return null;
+		Role[] roles = {Role.PROFESSOR};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the score already exists or not: '{}'", id);
+			Score score = null;
+			try {
+				score = pm.getObjectById(Score.class, id);
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("Score: {}", score);
+			if (score != null) {
+				logger.info("Setting student score: {}", score);
+				UserData user = scoreData.getStudent();
+				score.setStudent(new User(user.getLogin(), user.getPassword(), user.getName(), user.getSurname(), user.getRole()));
+				logger.info("Student set score: {}", score);
+
+				logger.info("Setting Subject score: {}", score);
+				SubjectData subject = scoreData.getSubject();
+				score.setSubject(new Subject(subject.getStartDate(), subject.getName(), 
+				new User(subject.getProfessor().getLogin(), subject.getProfessor().getPassword(), subject.getProfessor().getName(), subject.getProfessor().getSurname(), subject.getProfessor().getRole()),
+				subject.getId()));
+				logger.info("Subject set score: {}", score);
+
+				logger.info("Setting Score score: {}", score);
+				score.setScore(scoreData.getScore());
+				logger.info("Score set score: {}", user);
+
+				logger.info("Score updated: {}", score);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			} else {
+				logger.info("The user does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 	@DELETE
