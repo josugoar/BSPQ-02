@@ -79,14 +79,14 @@ public class ResourceTest {
         userData.setLogin("test-register");
         userData.setPassword("passwd");
 
-        Response response1 = resource.registerUser(userData);
+        Response response1 = resource.registerUser("test-admin", "test-admin", userData);
 
         assertEquals(Response.Status.OK, response1.getStatusInfo());
 
         User user = spy(User.class);
         when(persistenceManager.getObjectById(User.class, userData.getLogin())).thenReturn(user);
 
-        Response response2 = resource.registerUser(userData);
+        Response response2 = resource.registerUser("test-admin", "test-admin", userData);
 
         assertEquals(Response.Status.BAD_REQUEST, response2.getStatusInfo());
     }
