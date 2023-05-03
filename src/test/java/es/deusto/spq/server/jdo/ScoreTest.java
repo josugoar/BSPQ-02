@@ -12,15 +12,15 @@ import es.deusto.spq.pojo.Role;
 
 public class ScoreTest {
 
-    private User professor;
+    private User proffessor;
     private Subject subject;
     private User student;
     private Score score;
 
     @Before
     public void setUp() {
-        professor = new User("test-login", "test-password", "test-name", "test-surnmame", Role.PROFESSOR);
-        subject = new Subject(new Date(0), "test-name", professor, 0);
+        proffessor = new User("test-login", "test-password", "test-name", "test-surnmame", Role.PROFFESSOR);
+        subject = new Subject(new Date(0), "test-name", proffessor, 0);
         student = new User("test-login", "test-password", "test-name", "test-surnmame", Role.STUDENT);
         score = new Score(subject, student, 10.0f, 0);
     }    
@@ -70,7 +70,7 @@ public class ScoreTest {
 
     @Test
     public void testSetSubject() {
-        Subject newSubject = new Subject(new Date(1000), "test-name2", professor, 10);
+        Subject newSubject = new Subject(new Date(1000), "test-name2", proffessor, 10);
         score.setSubject(newSubject);
         assertEquals(newSubject, score.getSubject());
     }

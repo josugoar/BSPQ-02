@@ -12,15 +12,15 @@ public class Subject {
     private Integer id = null;
     private Date startDate = null;
     private String name = null;
-    private User professor = null;
+    private User proffessor = null;
 
     public Subject() {
 	}
 
-    public Subject(Date startDate, String name, User professor, Integer id) {
+    public Subject(Date startDate, String name, User proffessor, Integer id) {
         this.startDate = startDate;
         this.name = name;
-        this.professor = professor;
+        this.proffessor = proffessor;
         this.id = id;
     }
 
@@ -36,11 +36,11 @@ public class Subject {
     public void setName(String name) {
         this.name = name;
     }
-    public User getProfessor() {
-        return professor;
+    public User getProffessor() {
+        return proffessor;
     }
-    public void setProfessor(User professor) {
-        this.professor = professor;
+    public void setProffessor(User proffessor) {
+        this.proffessor = proffessor;
     }
     public Integer getId() {
         return id;
@@ -50,8 +50,8 @@ public class Subject {
     }
 
     public String toString() {
-		return "Subject: name --> " + this.name + ", start date --> " + this.startDate + ", professor name -->" + this.professor.getName()
-				+ ", professor surname -->" + this.professor.getSurname() +", id -->  " + this.id + "]";
+		return "Subject: name --> " + this.name + ", start date --> " + this.startDate + ", proffessor name -->" + this.proffessor.getName()
+				+ ", proffessor surname -->" + this.proffessor.getSurname() +", id -->  " + this.id + "]";
 	}
 
     @Override
@@ -60,7 +60,7 @@ public class Subject {
         int result = 1;
         result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((professor == null) ? 0 : professor.hashCode());
+        result = prime * result + ((proffessor == null) ? 0 : proffessor.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
@@ -84,10 +84,10 @@ public class Subject {
                 return false;
         } else if (!name.equals(other.name))
             return false;
-        if (professor == null) {
-            if (other.professor != null)
+        if (proffessor == null) {
+            if (other.proffessor != null)
                 return false;
-        } else if (!professor.equals(other.professor))
+        } else if (!proffessor.equals(other.proffessor))
             return false;
         if (id == null) {
             if (other.id != null)

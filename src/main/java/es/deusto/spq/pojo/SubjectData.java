@@ -8,7 +8,7 @@ public class SubjectData {
     
     private Date startDate;
     private String name;
-    private UserData professor;
+    private UserData proffessor;
     private Integer id;
 
     public SubjectData(){
@@ -17,7 +17,7 @@ public class SubjectData {
     public SubjectData(Subject subject) {
         this.startDate = subject.getStartDate();
         this.name = subject.getName();
-        this.professor = new UserData(subject.getProfessor());
+        this.proffessor = new UserData(subject.getProffessor());
         this.id = subject.getId();
     }
 
@@ -33,11 +33,11 @@ public class SubjectData {
     public void setName(String name) {
         this.name = name;
     }
-    public UserData getProfessor() {
-        return professor;
+    public UserData getProffessor() {
+        return proffessor;
     }
-    public void setProfessor(UserData professor) {
-        this.professor = professor;
+    public void setProffessor(UserData proffessor) {
+        this.proffessor = proffessor;
     }
     public Integer getId() {
         return id;
@@ -47,8 +47,8 @@ public class SubjectData {
     }
 
     public String toString() {
-		return "Subject: name --> " + this.name + ", start date --> " + this.startDate + ", professor name -->" + this.professor.getName()
-				+ ", professor surname -->" + this.professor.getSurname() +", id -->  " + this.id + "]";
+		return "Subject: name --> " + this.name + ", start date --> " + this.startDate + ", proffessor name -->" + this.proffessor.getName()
+				+ ", proffessor surname -->" + this.proffessor.getSurname() +", id -->  " + this.id + "]";
 	}
 
     @Override
@@ -57,7 +57,7 @@ public class SubjectData {
         int result = 1;
         result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((professor == null) ? 0 : professor.hashCode());
+        result = prime * result + ((proffessor == null) ? 0 : proffessor.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
@@ -81,10 +81,10 @@ public class SubjectData {
                 return false;
         } else if (!name.equals(other.name))
             return false;
-        if (professor == null) {
-            if (other.professor != null)
+        if (proffessor == null) {
+            if (other.proffessor != null)
                 return false;
-        } else if (!professor.equals(other.professor))
+        } else if (!proffessor.equals(other.proffessor))
             return false;
         if (id == null) {
             if (other.id != null)

@@ -262,7 +262,7 @@ public class Resource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
 
-		Role[] roles = {Role.ADMIN, Role.DEAN, Role.PROFESSOR};
+		Role[] roles = {Role.ADMIN, Role.DEAN, Role.PROFFESSOR};
 
 		if(authenticate(logIn, password)){
 			logger.info("User authenticated");
@@ -424,34 +424,226 @@ public class Resource {
 	@Path("/subjects")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSubject(@QueryParam("login") String logIn, @QueryParam("password") String password) {
-		return null;
+		List<Subject> subjects = null;
+		List<SubjectData> subjectsdat = new ArrayList<>();
+
+		Role[] roles = {Role.DEAN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			Query<Subject> q = pm.newQuery(Subject.class);
+			subjects = q.executeList();
+			
+			if (subjects != null) {
+				for (Subject subject : subjects) {
+					SubjectData subjectdat = new SubjectData(subject);
+					subjectsdat.add(subjectdat);
+				}
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.OK).entity(subjectsdat.toArray(new SubjectData[0])).build();
+			} else {
+				logger.info("Users not found");
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 
 	}
 
 	@POST
 	@Path("/subjects")
-	public Response registerSubject(SubjectData subjectData) {
-		return null;
-	}
+	public Response registerSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, SubjectData subjectData) {
+		Role[] roles = {Role.DEAN};
 
-	@GET
-	@Path("/subjects/{id}/get")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
-		return null;
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the subject already exists or not: '{}'", subjectData.getId());
+			Subject subject = null;
+			try {
+				subject = pm.getObjectById(Subject.class, subjectData.getId());
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
+			}
+			logger.info("Subject: {}", subject);
+			if (subject != null) {
+				logger.info("The user already exists");
+
+				tx.commit();
+				return Response.status(Status.BAD_REQUEST).build();
+			} else {
+				logger.info("Creating subject: {}", subject);
+
+				UserData proffessor = subjectData.getProffessor();
+				subject = new Subject(subjectData.getStartDate(), subjectData.getName(), 
+				new User(proffessor.getLogin(), proffessor.getPassword(), proffessor.getName(), proffessor.getSurname(), proffessor.getRole()),
+				subjectData.getId());
+
+				pm.makePersistent(subject);
+				logger.info("Subject created: {}", subject);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 	@PUT
 	@Path("/subjects/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, SubjectData subjectData) {
-		return null;
+		Role[] roles = {Role.DEAN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the Subject already exists or not: '{}'", subjectData.getId());
+			Subject subject = null;
+			try {
+				subject = pm.getObjectById(Subject.class, subjectData.getId());
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("User: {}", subject);
+			if (subject != null) {
+
+				logger.info("Setting name subject: {}", subject);
+				subject.setName(subjectData.getName());
+				logger.info("Name set subject: {}", subject);
+
+				logger.info("Setting starting date subject: {}", subject);
+				subject.setStartDate(subjectData.getStartDate());
+				logger.info("Starting date set subject: {}", subject);
+
+				logger.info("Setting proffessor subject: {}", subject);
+				UserData proffessor = subjectData.getProffessor();
+				subject.setProffessor(new User(proffessor.getLogin(), proffessor.getPassword(), proffessor.getName(), proffessor.getSurname(), proffessor.getRole()));
+				logger.info("Proffessor set subject: {}", subject);
+
+				logger.info("Subject updated: {}", subject);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			} else {
+				logger.info("The subject does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 	@DELETE
 	@Path("/subjects/{id}/delete")
 	public Response deleteSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
-		return null;
+		Role[] roles = {Role.DEAN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the subject already exists or not: '{}'", id);
+			Subject subject = null;
+			try {
+				subject = pm.getObjectById(Subject.class, id);
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
+			}
+			logger.info("Subject: {}", subject);
+			if (subject != null) {
+				logger.info("Deleting subject: {}", subject);
+				pm.deletePersistent(subject);
+				logger.info("Deleted subject: {}", subject);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			} else {
+				logger.info("The subject does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 	@GET
@@ -461,7 +653,7 @@ public class Resource {
 		List<Score> scores = null;
 		List<ScoreData> scoresdata = new ArrayList<>();
 
-		Role[] roles = {Role.DEAN, Role.PROFESSOR, Role.STUDENT};
+		Role[] roles = {Role.DEAN, Role.PROFFESSOR, Role.STUDENT};
 
 		User user = null;
 			try {
@@ -500,8 +692,8 @@ public class Resource {
 								scoresdata.add(scoredat);
 							}
 							break;
-						case PROFESSOR:
-							if (score.getSubject().getProfessor().equals(user)) {
+						case PROFFESSOR:
+							if (score.getSubject().getProffessor().equals(user)) {
 								scoresdata.add(scoredat);
 							}
 							break;
@@ -574,11 +766,11 @@ public class Resource {
 			} else {
 				logger.info("Creating score: {}", score);
 				SubjectData subject = scoreData.getSubject();
-				UserData professor = subject.getProfessor();
+				UserData proffessor = subject.getProffessor();
 				UserData student = scoreData.getStudent();
 
 				score = new Score(
-					new Subject(subject.getStartDate(), subject.getName(), new User(professor.getLogin(), professor.getPassword(), professor.getName(), professor.getSurname(), professor.getRole()), subject.getId())	, 
+					new Subject(subject.getStartDate(), subject.getName(), new User(proffessor.getLogin(), proffessor.getPassword(), proffessor.getName(), proffessor.getSurname(), proffessor.getRole()), subject.getId())	, 
 					new User(student.getLogin(), student.getPassword(), student.getName(), student.getSurname(), student.getRole()), 
 					scoreData.getScore(), 
 					scoreData.getId());
@@ -600,7 +792,7 @@ public class Resource {
 	@Path("/scores/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, ScoreData scoreData) {
-		Role[] roles = {Role.PROFESSOR};
+		Role[] roles = {Role.PROFFESSOR};
 
 		if(authenticate(logIn, password)){
 			logger.info("User authenticated");
@@ -635,7 +827,7 @@ public class Resource {
 				logger.info("Setting Subject score: {}", score);
 				SubjectData subject = scoreData.getSubject();
 				score.setSubject(new Subject(subject.getStartDate(), subject.getName(), 
-				new User(subject.getProfessor().getLogin(), subject.getProfessor().getPassword(), subject.getProfessor().getName(), subject.getProfessor().getSurname(), subject.getProfessor().getRole()),
+				new User(subject.getProffessor().getLogin(), subject.getProffessor().getPassword(), subject.getProffessor().getName(), subject.getProffessor().getSurname(), subject.getProffessor().getRole()),
 				subject.getId()));
 				logger.info("Subject set score: {}", score);
 
