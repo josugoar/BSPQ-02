@@ -36,7 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class ProfessorClient extends JFrame {
+public class ProffessorClient extends JFrame {
 	private JPanel contentPane;
 	private JTextField textID;
 	private JTextField textScore;
@@ -48,7 +48,7 @@ public class ProfessorClient extends JFrame {
 	private UserData user;
 	private ScoreData score;
 
-    public ProfessorClient(UserData user, String hostname, String port) {
+    public ProffessorClient(UserData user, String hostname, String port) {
 		this.user = user;
         client = ClientBuilder.newClient();
 		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
