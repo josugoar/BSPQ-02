@@ -10,7 +10,7 @@ import org.junit.Test;
 public class SubjectDataTest {
 
     SubjectData subjectData;
-    UserData professor;
+    UserData proffessor;
     Date startD;
     
     @Before
@@ -18,7 +18,7 @@ public class SubjectDataTest {
         subjectData = new SubjectData();
         subjectData.setId(0000);
         subjectData.setName("name");
-        subjectData.setProfessor(professor);
+        subjectData.setProffessor(proffessor);
         subjectData.setStartDate(startD);
     }
 
@@ -33,8 +33,8 @@ public class SubjectDataTest {
     }
 
     @Test
-    public void testProfessor() {
-        assertEquals(professor, subjectData.getProfessor());
+    public void testProffessor() {
+        assertEquals(proffessor, subjectData.getProffessor());
     }
 
     @Test

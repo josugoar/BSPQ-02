@@ -12,12 +12,12 @@ import es.deusto.spq.pojo.Role;
 public class SubjectTest {
 
     private Subject subject;
-    private User professor = new User("prof-login", "prof-pass", "prof-name", "prof-surname", Role.PROFESSOR);
+    private User proffessor = new User("prof-login", "prof-pass", "prof-name", "prof-surname", Role.PROFFESSOR);
     private Date date = new Date(System.currentTimeMillis());
 
     @Before
     public void setUp() {
-        subject = new Subject(date, "test-name", professor, 1);
+        subject = new Subject(date, "test-name", proffessor, 1);
     }
 
 
@@ -32,8 +32,8 @@ public class SubjectTest {
     }
 
     @Test
-    public void testGetProfessor() {
-        assertEquals(professor, subject.getProfessor());
+    public void testGetProffessor() {
+        assertEquals(proffessor, subject.getProffessor());
     }
 
     @Test
@@ -54,10 +54,10 @@ public class SubjectTest {
     }
 
     @Test
-    public void testSetProfessor() {
-        User newProf = new User("newlogin", "newpass", "newname", "newsurname", Role.PROFESSOR);
-        subject.setProfessor(newProf);
-        assertEquals(newProf, subject.getProfessor());
+    public void testSetProffessor() {
+        User newProf = new User("newlogin", "newpass", "newname", "newsurname", Role.PROFFESSOR);
+        subject.setProffessor(newProf);
+        assertEquals(newProf, subject.getProffessor());
     }
 
     @Test

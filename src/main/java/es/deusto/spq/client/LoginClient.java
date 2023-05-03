@@ -103,10 +103,10 @@ class LoginClient extends JFrame implements ActionListener {
                     adminClient.setVisible(true);
                     break;
 
-                case PROFESSOR:
-                    ProfessorClient professorClient = new ProfessorClient(user, hostname, port);
+                case PROFFESSOR:
+                    ProffessorClient proffessorClient = new ProffessorClient(user, hostname, port);
                     setVisible(false);
-                    professorClient.setVisible(true);
+                    proffessorClient.setVisible(true);
                     break;
             
                 default:
