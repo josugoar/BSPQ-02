@@ -33,7 +33,6 @@ import java.awt.event.ComponentEvent;
 
 import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.UserData;
-import es.deusto.spq.pojo.SubjectData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,7 +47,6 @@ public class ProffessorClient extends JFrame {
 	private WebTarget webTarget;
     protected static final Logger logger = LogManager.getLogger();
 	private UserData user;
-	private ScoreData score;
 	private List<ScoreData> scores;
 
     public ProffessorClient(UserData user, String hostname, String port) {
@@ -216,7 +214,15 @@ public class ProffessorClient extends JFrame {
 		JPanel panelChangeSubject = new JPanel();
 		panelAccountInfo.add(panelChangeSubject);
 		
-		JButton btnChangeSubject = new JButton("Cambiar de Asignatura");
+		JButton btnChangeSubject = new JButton("Borrar Asignatura");
+		btnChangeSubject.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteScore();			
+			}
+		});
+
 		btnChangeSubject.setFont(new Font("Tahoma", Font.BOLD, 12));
 		panelChangeSubject.add(btnChangeSubject);
 
@@ -281,7 +287,7 @@ public class ProffessorClient extends JFrame {
 		}
 
         scoData.setScore(Score);
-
+		System.out.println("Dato a actualizar: " + scoData + "\n");
 		WebTarget updateScoreWebTarget = webTarget.path("scores/" + textID.getText() + "/update")
 			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = updateScoreWebTarget.request(MediaType.APPLICATION_JSON);
@@ -294,8 +300,7 @@ public class ProffessorClient extends JFrame {
 		}
 	}
 
-	private void deleteScore(String email){
-	
+	private void deleteScore(){
 		WebTarget deleteScoreWebTarget = webTarget.path("scores/" + textID.getText() + "/delete")
 			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = deleteScoreWebTarget.request(MediaType.APPLICATION_JSON);
