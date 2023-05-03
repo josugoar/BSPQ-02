@@ -128,7 +128,6 @@ public class ResourceTest {
         assertEquals(Response.Status.OK, response2.getStatusInfo());
     }
 
-<<<<<<< HEAD
     @Test
     public void testGetUsers() {
         UserData userData = new UserData();
@@ -148,8 +147,4 @@ public class ResourceTest {
         assertEquals(Response.Status.OK, response2.getStatusInfo());
     }
 
-
-
-=======
->>>>>>> d0abf77cb709f2ba98cb5ce4ceb9482ed43ba34a
 }
