@@ -463,8 +463,8 @@ public class Resource {
 		User user = null;
 			try {
 				user = pm.getObjectById(User.class, logIn);
-			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
-				logger.info("Exception launched: {}", jonfe.getMessage());
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
 			}
 
 		if(authenticate(logIn, password)){
@@ -559,8 +559,8 @@ public class Resource {
 			Score score = null;
 			try {
 				score = pm.getObjectById(Score.class, scoreData.getId());
-			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
-				logger.info("Exception launched: {}", jonfe.getMessage());
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
 			}
 			logger.info("Score: {}", score);
 			if (score != null) {
@@ -619,8 +619,8 @@ public class Resource {
 			Score score = null;
 			try {
 				score = pm.getObjectById(Score.class, id);
-			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
-				logger.info("Exception launched: {}", jonfe.getMessage());
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
 			}
 			logger.info("Score: {}", score);
 			if (score != null) {
@@ -683,8 +683,8 @@ public class Resource {
 			Score score = null;
 			try {
 				score = pm.getObjectById(Score.class, id);
-			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
-				logger.info("Exception launched: {}", jonfe.getMessage());
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
 			}
 			logger.info("Score: {}", score);
 			if (score != null) {
