@@ -3,6 +3,7 @@ package es.deusto.spq.server;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -129,6 +131,24 @@ public class ResourceTest {
     }
 
     @Test
+    public void testRegisterUserNotFound() {
+        UserData userData = new UserData();
+        userData.setLogin("test-register");
+        userData.setPassword("passwd");
+
+        when(transaction.isActive()).thenReturn(true);
+
+        Response response = resource.registerUser("test-admin", "test-admin", userData);
+
+        assertEquals(Response.Status.OK, response.getStatusInfo());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(persistenceManager).makePersistent(userCaptor.capture());
+        assertEquals("test-register", userCaptor.getValue().getLogin());
+        assertEquals("passwd", userCaptor.getValue().getPassword());
+    }
+
+    @Test
     public void testGetUsers() {
         UserData userData = new UserData();
         userData.setLogin("test-user");
@@ -162,6 +182,10 @@ public class ResourceTest {
         when(persistenceManager.getObjectById(User.class, userData.getLogin())).thenReturn(user);
 
         Response response2 = resource.updateUser("test-admin", "test-admin", userData.getLogin(), userData);
+
+        ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+        verify(user).setPassword(passwordCaptor.capture());
+        assertEquals("password", passwordCaptor.getValue());
 
         assertEquals(Response.Status.OK, response2.getStatusInfo());
     }
