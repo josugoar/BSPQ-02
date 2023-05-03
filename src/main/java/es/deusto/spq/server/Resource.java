@@ -688,16 +688,17 @@ public class Resource {
 					ScoreData scoredat = new ScoreData(score);
 					switch (user.getRole()) {
 						case STUDENT:
-							if (score.getStudent().getLogin().equals(user.getLogin())) {
+							if (score.getStudent().getLogin().equals(logIn)) {
 								scoresdata.add(scoredat);
 							}
 							break;
 						case PROFFESSOR:
-							if (score.getSubject().getProffessor().getLogin().equals(user.getLogin())) {
+							if (score.getSubject().getProffessor().getLogin().equals(logIn)) {
 								scoresdata.add(scoredat);
 							}
 							break;
 						case DEAN:
+						case ADMIN:
 							scoresdata.add(scoredat);
 							break;
 						default:
