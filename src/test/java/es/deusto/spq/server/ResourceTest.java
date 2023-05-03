@@ -301,5 +301,132 @@ public class ResourceTest {
 
         assertEquals(Response.Status.OK, response2.getStatusInfo());
     }
+    
+        @Test
+    public void testGetScore() {
+        User student = new User();
+        student.setLogin("test-user");
+        student.setPassword("password");
+        student.setRole(Role.STUDENT);
+
+        User proffessor = new User();
+        proffessor.setLogin("test-proffessor");
+        proffessor.setPassword("passwd");
+        proffessor.setRole(Role.PROFFESSOR);
+
+        User fakeProffessor = new User();
+        fakeProffessor.setLogin("fake-proffessor");
+        fakeProffessor.setPassword("passwd");
+        fakeProffessor.setRole(Role.PROFFESSOR);
+
+        Subject subject = new Subject();
+        subject.setId(1);
+        subject.setProffessor(proffessor);
+
+        Subject fakeSubject = new Subject();
+        fakeSubject.setId(2);
+        fakeSubject.setProffessor(fakeProffessor);
+
+        Score score1 = new Score(
+            subject,
+            student,
+            8.3f, 
+            1);
+
+        Score score2 = new Score(
+            subject,
+            student,
+            8.3f, 
+            2);
+        
+        Score score3 = new Score(
+            fakeSubject,
+            student,
+            8.3f, 
+            3);
+        List<Score> scorelist = new ArrayList<>();
+        scorelist.add(score1);
+        scorelist.add(score2);
+        scorelist.add(score3);
+
+        when(persistenceManager.newQuery(Score.class)).thenReturn(queryScore);
+        when(queryScore.executeList()).thenReturn(scorelist);
+
+        when(persistenceManager.getObjectById(User.class, student.getLogin())).thenReturn(student);
+        when(student.getLogin()).thenReturn("test-user");
+        when(student.getPassword()).thenReturn("password");
+
+        Response response1 = resource.getScore("test-student", "password");
+
+        assertEquals(Response.Status.OK, response1.getStatusInfo());
+        assertEquals(3, ((ScoreData[])response1.getEntity()).length);
+
+        when(persistenceManager.getObjectById(User.class, proffessor.getLogin())).thenReturn(proffessor);
+        when(proffessor.getLogin()).thenReturn("test-proffessor");
+        when(proffessor.getPassword()).thenReturn("passwd");
+
+        Response response2 = resource.getScore("test-proffessor", "passwd");
+
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+        assertEquals(2, ((ScoreData[])response1.getEntity()).length);
+    }
+
+    @Test
+    public void testRegisterScore() {
+        UserData userData = new UserData();
+        userData.setLogin("test-user");
+        userData.setPassword("password");
+        userData.setRole(Role.STUDENT);
+
+        UserData userData2 = new UserData();
+        userData2.setLogin("test-proffessor");
+        userData2.setPassword("passwd");
+        userData2.setRole(Role.PROFFESSOR);
+
+        SubjectData subjectData = new SubjectData();
+        subjectData.setId(1);
+        subjectData.setProffessor(userData2);
+
+        ScoreData scoreData = new ScoreData();
+        scoreData.setId(1);
+        scoreData.setScore(8.3f);
+        scoreData.setStudent(userData);
+        scoreData.setSubject(subjectData);
+
+        Response response1 = resource.registerScore("test-admin", "test-admin", scoreData);
+
+        assertEquals(Response.Status.OK, response1.getStatusInfo());
+
+        Score score = spy(Score.class);
+        when(persistenceManager.getObjectById(Score.class, scoreData.getId())).thenReturn(score);
+
+        Response response2 = resource.registerScore("test-admin", "test-admin", scoreData);
+
+        assertEquals(Response.Status.BAD_REQUEST, response2.getStatusInfo());
+    }
+
+    @Test
+    public void testUpdateScore() {
+        UserData userData = new UserData();
+        userData.setLogin("test-user");
+        userData.setPassword("password");
+        userData.setRole(Role.ADMIN);
+
+        Response response1 = resource.updateUser("test-admin", "test-admin", userData.getLogin(), userData);
+
+        assertEquals(Response.Status.NOT_FOUND, response1.getStatusInfo());
+
+        User user = spy(User.class);
+        when(persistenceManager.getObjectById(User.class, userData.getLogin())).thenReturn(user);
+
+        Response response2 = resource.updateUser("test-admin", "test-admin", userData.getLogin(), userData);
+
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+    }
+
+    @Test
+    public void testDeleteScore() {
+
+    }
 
 }
