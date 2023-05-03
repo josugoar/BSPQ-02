@@ -5,9 +5,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
+import javax.jdo.Query;
 import javax.jdo.Transaction;
 import javax.ws.rs.core.Response;
 
@@ -32,6 +36,9 @@ public class ResourceTest {
 
     @Mock
     private Transaction transaction;
+
+    @Mock
+    private Query<User> queryUser;
 
     @Before
     public void setUp() {
@@ -117,6 +124,26 @@ public class ResourceTest {
 
         assertEquals(Response.Status.BAD_REQUEST, response4.getStatusInfo());
     }
+
+    @Test
+    public void testGetUsers() {
+        UserData userData = new UserData();
+        userData.setLogin("test-user");
+        userData.setPassword("password");
+        userData.setRole(Role.ADMIN);
+
+        User user = new User(userData.getLogin(), userData.getPassword(), userData.getName(), userData.getSurname(), userData.getRole());
+        List<User> userlist = new ArrayList<>();
+        userlist.add(user);
+
+        when(persistenceManager.newQuery(User.class)).thenReturn(queryUser);
+        when(queryUser.executeList()).thenReturn(userlist);
+
+        Response response2 = resource.getUsers("test-admin", "test-admin");
+
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+    }
+
 
 
 }
