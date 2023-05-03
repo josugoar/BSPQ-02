@@ -392,7 +392,6 @@ public class Resource {
 			if (user != null) {
 				logger.info("Deleting user: {}", user);
 				pm.deletePersistent(user);
-				logger.info("Deleted user: {}", user);
 
 				tx.commit();
 				return Response.status(Status.OK).build();
