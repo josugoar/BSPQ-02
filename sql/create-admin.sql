@@ -1,4 +1,0 @@
-USE learnifyDB;
-
-/* CREATE AN ADMIN ACCOUNT*/
-INSERT INTO USER(LOGIN,NAME,PASSWORD, ROLE, SURNAME) VALUES ("admin", "admin", "admin", "ADMIN", "admin" );

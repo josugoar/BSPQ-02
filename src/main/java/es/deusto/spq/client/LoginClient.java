@@ -27,7 +27,7 @@ class LoginClient extends JFrame implements ActionListener {
     public LoginClient(String hostname, String port) {
         
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setSize(500,300);
+        this.setSize(400, 200);
 
         this.hostname = hostname;
         this.port = port;
@@ -45,7 +45,7 @@ class LoginClient extends JFrame implements ActionListener {
         textField2 = new JPasswordField(15);
 
         panel = new JPanel();
-        BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+        BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
         panel.setLayout(boxLayout);
 
         panel1 = new JPanel();
@@ -53,8 +53,8 @@ class LoginClient extends JFrame implements ActionListener {
         panel1.add(textField1);
 
         panel2 = new JPanel();
-        panel1.add(passLabel);
-        panel1.add(textField2);
+        panel2.add(passLabel);
+        panel2.add(textField2);
         
         panel3 = new JPanel();
         b1 = new JButton("SUBMIT");
@@ -63,6 +63,8 @@ class LoginClient extends JFrame implements ActionListener {
         panel.add(panel1);
         panel.add(panel2);
         panel.add(panel3);
+        
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         add(panel, BorderLayout.CENTER);
 
