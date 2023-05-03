@@ -9,6 +9,8 @@ import javax.jdo.Query;
 import javax.jdo.JDOHelper;
 import javax.jdo.Transaction;
 
+import es.deusto.spq.server.jdo.Score;
+import es.deusto.spq.server.jdo.Subject;
 import es.deusto.spq.server.jdo.User;
 import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.ScoreData;
@@ -205,7 +207,23 @@ public class Resource {
 
 	@POST
 	@Path("/users")
-	public Response registerUser(UserData userData) {
+	public Response registerUser(@QueryParam("login") String logIn, @QueryParam("password") String password, UserData userData) {
+		Role[] roles = {Role.ADMIN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
@@ -440,33 +458,256 @@ public class Resource {
 	@Path("/scores")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScore(@QueryParam("login") String logIn, @QueryParam("password") String password) {
-		return null;
+		List<Score> scores = null;
+		List<ScoreData> scoresdata = new ArrayList<>();
+
+		Role[] roles = {Role.DEAN, Role.PROFESSOR, Role.STUDENT};
+
+		User user = null;
+			try {
+				user = pm.getObjectById(User.class, logIn);
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
+			}
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Creating query ...");
+
+			Query<Score> q = pm.newQuery(Score.class);
+			scores = q.executeList();
+			
+			if (scores != null) {
+				for (Score score : scores) {
+					ScoreData scoredat = new ScoreData(score);
+					switch (user.getRole()) {
+						case STUDENT:
+							if (score.getStudent().equals(user)) {
+								scoresdata.add(scoredat);
+							}
+							break;
+						case PROFESSOR:
+							if (score.getSubject().getProfessor().equals(user)) {
+								scoresdata.add(scoredat);
+							}
+							break;
+						case DEAN:
+							scoresdata.add(scoredat);
+							break;
+						default:
+							break;
+					}
+				}
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.OK).entity(scoresdata.toArray(new ScoreData[0])).build();
+			} else {
+				logger.info("Scores not found");
+				try {
+					q.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 	@POST
 	@Path("/scores")
-	public Response registerScore(ScoreData scoreData) {
-		return null;
+	public Response registerScore(@QueryParam("login") String logIn, @QueryParam("password") String password, ScoreData scoreData) {
+
+		Role[] roles = {Role.DEAN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the score already exists or not: '{}'", scoreData.getId());
+			Score score = null;
+			try {
+				score = pm.getObjectById(Score.class, scoreData.getId());
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
+			}
+			logger.info("Score: {}", score);
+			if (score != null) {
+				logger.info("The score already exists");
+
+				tx.commit();
+				return Response.status(Status.BAD_REQUEST).build();
+			} else {
+				logger.info("Creating score: {}", score);
+				SubjectData subject = scoreData.getSubject();
+				UserData professor = subject.getProfessor();
+				UserData student = scoreData.getStudent();
+
+				score = new Score(
+					new Subject(subject.getStartDate(), subject.getName(), new User(professor.getLogin(), professor.getPassword(), professor.getName(), professor.getSurname(), professor.getRole()), subject.getId())	, 
+					new User(student.getLogin(), student.getPassword(), student.getName(), student.getSurname(), student.getRole()), 
+					scoreData.getScore(), 
+					scoreData.getId());
+				pm.makePersistent(score);
+				logger.info("Score created: {}", score);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
-	@GET
-	@Path("/scores/{id}/get")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
-		return null;
-	}
 
 	@PUT
 	@Path("/scores/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, ScoreData scoreData) {
-		return null;
+		Role[] roles = {Role.PROFESSOR};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the score already exists or not: '{}'", id);
+			Score score = null;
+			try {
+				score = pm.getObjectById(Score.class, id);
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
+			}
+			logger.info("Score: {}", score);
+			if (score != null) {
+				logger.info("Setting student score: {}", score);
+				UserData user = scoreData.getStudent();
+				score.setStudent(new User(user.getLogin(), user.getPassword(), user.getName(), user.getSurname(), user.getRole()));
+				logger.info("Student set score: {}", score);
+
+				logger.info("Setting Subject score: {}", score);
+				SubjectData subject = scoreData.getSubject();
+				score.setSubject(new Subject(subject.getStartDate(), subject.getName(), 
+				new User(subject.getProfessor().getLogin(), subject.getProfessor().getPassword(), subject.getProfessor().getName(), subject.getProfessor().getSurname(), subject.getProfessor().getRole()),
+				subject.getId()));
+				logger.info("Subject set score: {}", score);
+
+				logger.info("Setting Score score: {}", score);
+				score.setScore(scoreData.getScore());
+				logger.info("Score set score: {}", user);
+
+				logger.info("Score updated: {}", score);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			} else {
+				logger.info("The user does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 	@DELETE
 	@Path("/scores/{id}/delete")
 	public Response deleteScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
-		return null;
+		
+		Role[] roles = {Role.DEAN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the score already exists or not: '{}'", id);
+			Score score = null;
+			try {
+				score = pm.getObjectById(Score.class, id);
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
+			}
+			logger.info("Score: {}", score);
+			if (score != null) {
+				logger.info("Deleting score: {}", score);
+				pm.deletePersistent(score);
+				logger.info("Deleted score: {}", score);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			} else {
+				logger.info("The score does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 }
