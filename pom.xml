@@ -188,6 +188,7 @@
 				<configuration>
 					<excludes>
 						<exclude>**/client/*.class</exclude>
+						<exclude>**/test/*.class</exclude>
 					</excludes>
 				</configuration>
 				<executions>
