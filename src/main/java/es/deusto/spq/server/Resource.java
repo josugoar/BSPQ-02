@@ -775,7 +775,7 @@ public class Resource {
 			logger.info("Authorization failed");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-
+		logger.info("Aqui no llega");
 		try {
 			tx.begin();
 			logger.info("Checking whether the score already exists or not: '{}'", id);
@@ -792,6 +792,7 @@ public class Resource {
 				score.setStudent(new User(user.getLogin(), user.getPassword(), user.getName(), user.getSurname(), user.getRole()));
 				logger.info("Student set score: {}", score);
 
+				// TODO: get users by id
 				logger.info("Setting Subject score: {}", score);
 				SubjectData subject = scoreData.getSubject();
 				score.setSubject(new Subject(subject.getStartDate(), subject.getName(), 
