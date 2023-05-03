@@ -423,7 +423,7 @@ public class Resource {
 	@GET
 	@Path("/subjects")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSubject(@QueryParam("login") String logIn, @QueryParam("password") String password) {
+	public Response getSubjects(@QueryParam("login") String logIn, @QueryParam("password") String password) {
 		List<Subject> subjects = null;
 		List<SubjectData> subjectsdat = new ArrayList<>();
 
@@ -538,7 +538,7 @@ public class Resource {
 	@PUT
 	@Path("/subjects/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, SubjectData subjectData) {
+	public Response updateSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") Integer id, SubjectData subjectData) {
 		Role[] roles = {Role.DEAN};
 
 		if(authenticate(logIn, password)){
@@ -599,7 +599,7 @@ public class Resource {
 
 	@DELETE
 	@Path("/subjects/{id}/delete")
-	public Response deleteSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
+	public Response deleteSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") Integer id) {
 		Role[] roles = {Role.DEAN};
 
 		if(authenticate(logIn, password)){
@@ -791,7 +791,7 @@ public class Resource {
 	@PUT
 	@Path("/scores/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id, ScoreData scoreData) {
+	public Response updateScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") Integer id, ScoreData scoreData) {
 		Role[] roles = {Role.PROFFESSOR};
 
 		if(authenticate(logIn, password)){
@@ -854,7 +854,7 @@ public class Resource {
 
 	@DELETE
 	@Path("/scores/{id}/delete")
-	public Response deleteScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
+	public Response deleteScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") Integer id) {
 		
 		Role[] roles = {Role.DEAN};
 
