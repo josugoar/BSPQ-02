@@ -204,7 +204,23 @@ public class Resource {
 
 	@POST
 	@Path("/users")
-	public Response registerUser(UserData userData) {
+	public Response registerUser(@QueryParam("login") String logIn, @QueryParam("password") String password, UserData userData) {
+		Role[] roles = {Role.ADMIN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
 		try {
 			tx.begin();
 			logger.info("Checking whether the user already exists or not: '{}'", userData.getLogin());
@@ -519,16 +535,63 @@ public class Resource {
 
 	@POST
 	@Path("/scores")
-	public Response registerScore(ScoreData scoreData) {
-		return null;
+	public Response registerScore(@QueryParam("login") String logIn, @QueryParam("password") String password, ScoreData scoreData) {
+
+		Role[] roles = {Role.DEAN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the score already exists or not: '{}'", scoreData.getId());
+			Score score = null;
+			try {
+				score = pm.getObjectById(Score.class, scoreData.getId());
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("Score: {}", score);
+			if (score != null) {
+				logger.info("The score already exists");
+
+				tx.commit();
+				return Response.status(Status.BAD_REQUEST).build();
+			} else {
+				logger.info("Creating score: {}", score);
+				SubjectData subject = scoreData.getSubject();
+				UserData professor = subject.getProfessor();
+				UserData student = scoreData.getStudent();
+
+				score = new Score(
+					new Subject(subject.getStartDate(), subject.getName(), new User(professor.getLogin(), professor.getPassword(), professor.getName(), professor.getSurname(), professor.getRole()), subject.getId())	, 
+					new User(student.getLogin(), student.getPassword(), student.getName(), student.getSurname(), student.getRole()), 
+					scoreData.getScore(), 
+					scoreData.getId());
+				pm.makePersistent(score);
+				logger.info("Score created: {}", score);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
-	@GET
-	@Path("/scores/{id}/get")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
-		return null;
-	}
 
 	@PUT
 	@Path("/scores/{id}/update")
@@ -597,7 +660,51 @@ public class Resource {
 	@DELETE
 	@Path("/scores/{id}/delete")
 	public Response deleteScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") String id) {
-		return null;
+		
+		Role[] roles = {Role.DEAN};
+
+		if(authenticate(logIn, password)){
+			logger.info("User authenticated");
+		} else {
+			logger.info("Authentication failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		if(authorize(logIn, roles)){
+			logger.info("User authorized");
+		} else {
+			logger.info("Authorization failed");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+
+		try {
+			tx.begin();
+			logger.info("Checking whether the score already exists or not: '{}'", id);
+			Score score = null;
+			try {
+				score = pm.getObjectById(Score.class, id);
+			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
+				logger.info("Exception launched: {}", jonfe.getMessage());
+			}
+			logger.info("Score: {}", score);
+			if (score != null) {
+				logger.info("Deleting score: {}", score);
+				pm.deletePersistent(score);
+				logger.info("Deleted score: {}", score);
+
+				tx.commit();
+				return Response.status(Status.OK).build();
+			} else {
+				logger.info("The score does not exist");
+
+				tx.commit();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+		} finally {
+			if (tx.isActive()) {
+				tx.rollback();
+			}
+		}
 	}
 
 }
