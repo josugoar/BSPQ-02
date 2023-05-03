@@ -55,6 +55,17 @@ public class ResourceTest {
     }
 
     @Test
+    public void testAuthenticate() {
+        Response response4 = resource.getUser("no-admin", "no-admin", "");
+
+        assertEquals(Response.Status.BAD_REQUEST, response4.getStatusInfo());
+
+        Response response3 = resource.getUser("test-admin", "no-admin", "");
+
+        assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
+    }
+
+    @Test
     public void testLogin() {
         UserData userData = new UserData();
         userData.setLogin("test-login");
@@ -95,7 +106,7 @@ public class ResourceTest {
     public void testGetUser() {
         Response response1 = resource.getUser("test-admin", "test-admin", "nonexistent");
 
-        assertEquals(Response.Status.BAD_REQUEST, response1.getStatusInfo());
+        assertEquals(Response.Status.NOT_FOUND, response1.getStatusInfo());
 
         UserData userData = new UserData();
         userData.setLogin("test-user");
@@ -105,18 +116,9 @@ public class ResourceTest {
         User user2 = spy(User.class);
         when(persistenceManager.getObjectById(User.class, userData.getLogin())).thenReturn(user2);
 
-        Response response2 = resource.getUser("test-admin", "test-admin", user2.getLogin());
+        Response response2 = resource.getUser("test-admin", "test-admin", userData.getLogin());
 
         assertEquals(Response.Status.OK, response2.getStatusInfo());
-
-        Response response3 = resource.getUser("test-admin", "no-admin", user2.getLogin());
-
-        assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
-
-        Response response4 = resource.getUser("no-admin", "no-admin", user2.getLogin());
-
-        assertEquals(Response.Status.BAD_REQUEST, response4.getStatusInfo());
     }
-
 
 }
