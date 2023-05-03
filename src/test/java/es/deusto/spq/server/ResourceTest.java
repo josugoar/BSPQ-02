@@ -52,6 +52,12 @@ public class ResourceTest {
     @Mock
     private Query<Score> queryScore;
 
+    User adminUser;
+    User deanUser;
+    User studentUser;
+    User proffessorUser;
+    User fakeProffessor;
+
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -66,18 +72,35 @@ public class ResourceTest {
             resource = new Resource();
         }
 
-        User user1 = spy(User.class);
-        when(user1.getLogin()).thenReturn("test-admin");
-        when(user1.getPassword()).thenReturn("test-admin");
-        when(user1.getRole()).thenReturn(Role.ADMIN);
-        when(persistenceManager.getObjectById(User.class, "test-admin")).thenReturn(user1);
+        adminUser = spy(User.class);
+        when(adminUser.getLogin()).thenReturn("test-admin");
+        when(adminUser.getPassword()).thenReturn("test-admin");
+        when(adminUser.getRole()).thenReturn(Role.ADMIN);
+        when(persistenceManager.getObjectById(User.class, "test-admin")).thenReturn(adminUser);
 
-        User user2 = spy(User.class);
-        when(user2.getLogin()).thenReturn("test-dean");
-        when(user2.getPassword()).thenReturn("test-dean");
-        when(user2.getRole()).thenReturn(Role.DEAN);
-        when(persistenceManager.getObjectById(User.class, "test-dean")).thenReturn(user2);
-        
+        deanUser = spy(User.class);
+        when(deanUser.getLogin()).thenReturn("test-dean");
+        when(deanUser.getPassword()).thenReturn("test-dean");
+        when(deanUser.getRole()).thenReturn(Role.DEAN);
+        when(persistenceManager.getObjectById(User.class, "test-dean")).thenReturn(deanUser);
+
+        studentUser = spy(User.class);
+        when(studentUser.getLogin()).thenReturn("test-student");
+        when(studentUser.getPassword()).thenReturn("test-student");
+        when(studentUser.getRole()).thenReturn(Role.STUDENT);
+        when(persistenceManager.getObjectById(User.class, "test-student")).thenReturn(studentUser);
+
+        proffessorUser = spy(User.class);
+        when(proffessorUser.getLogin()).thenReturn("test-proffessor");
+        when(proffessorUser.getPassword()).thenReturn("test-proffessor");
+        when(proffessorUser.getRole()).thenReturn(Role.PROFFESSOR);
+        when(persistenceManager.getObjectById(User.class, "test-proffessor")).thenReturn(proffessorUser);
+
+        fakeProffessor = spy(User.class);
+        when(fakeProffessor.getLogin()).thenReturn("fake-proffessor");
+        when(fakeProffessor.getPassword()).thenReturn("fake-proffessor");
+        when(fakeProffessor.getRole()).thenReturn(Role.PROFFESSOR);
+        when(persistenceManager.getObjectById(User.class, "fake-proffessor")).thenReturn(fakeProffessor);        
     }
 
     @Test
@@ -309,44 +332,33 @@ public class ResourceTest {
     
         @Test
     public void testGetScore() {
-        User student = new User();
-        student.setLogin("test-user");
-        student.setPassword("password");
-        student.setRole(Role.STUDENT);
+        Subject subject1 = new Subject();
+        subject1.setId(1);
+        subject1.setProffessor(proffessorUser);
 
-        User proffessor = new User();
-        proffessor.setLogin("test-proffessor");
-        proffessor.setPassword("passwd");
-        proffessor.setRole(Role.PROFFESSOR);
+        Subject subject2 = new Subject();
+        subject2.setId(2);
+        subject2.setProffessor(proffessorUser);
 
-        User fakeProffessor = new User();
-        fakeProffessor.setLogin("fake-proffessor");
-        fakeProffessor.setPassword("passwd");
-        fakeProffessor.setRole(Role.PROFFESSOR);
-
-        Subject subject = new Subject();
-        subject.setId(1);
-        subject.setProffessor(proffessor);
-
-        Subject fakeSubject = new Subject();
-        fakeSubject.setId(2);
-        fakeSubject.setProffessor(fakeProffessor);
+        Subject subject3 = new Subject();
+        subject3.setId(3);
+        subject3.setProffessor(fakeProffessor);
 
         Score score1 = new Score(
-            subject,
-            student,
+            subject1,
+            studentUser,
             8.3f, 
             1);
 
         Score score2 = new Score(
-            subject,
-            student,
+            subject2,
+            studentUser,
             8.3f, 
             2);
         
         Score score3 = new Score(
-            fakeSubject,
-            student,
+            subject3,
+            studentUser,
             8.3f, 
             3);
         List<Score> scorelist = new ArrayList<>();
@@ -357,23 +369,15 @@ public class ResourceTest {
         when(persistenceManager.newQuery(Score.class)).thenReturn(queryScore);
         when(queryScore.executeList()).thenReturn(scorelist);
 
-        when(persistenceManager.getObjectById(User.class, student.getLogin())).thenReturn(student);
-        when(student.getLogin()).thenReturn("test-user");
-        when(student.getPassword()).thenReturn("password");
-
-        Response response1 = resource.getScore("test-student", "password");
+        Response response1 = resource.getScore("test-student", "test-student");
 
         assertEquals(Response.Status.OK, response1.getStatusInfo());
         assertEquals(3, ((ScoreData[])response1.getEntity()).length);
 
-        when(persistenceManager.getObjectById(User.class, proffessor.getLogin())).thenReturn(proffessor);
-        when(proffessor.getLogin()).thenReturn("test-proffessor");
-        when(proffessor.getPassword()).thenReturn("passwd");
-
-        Response response2 = resource.getScore("test-proffessor", "passwd");
+        Response response2 = resource.getScore("test-proffessor", "test-proffessor");
 
         assertEquals(Response.Status.OK, response2.getStatusInfo());
-        assertEquals(2, ((ScoreData[])response1.getEntity()).length);
+        assertEquals(2, ((ScoreData[])response2.getEntity()).length);
     }
 
     @Test
