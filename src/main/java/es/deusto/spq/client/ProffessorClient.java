@@ -28,6 +28,8 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.UserData;
@@ -47,11 +49,19 @@ public class ProffessorClient extends JFrame {
     protected static final Logger logger = LogManager.getLogger();
 	private UserData user;
 	private ScoreData score;
+	private List<ScoreData> scores;
 
     public ProffessorClient(UserData user, String hostname, String port) {
 		this.user = user;
         client = ClientBuilder.newClient();
 		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
+
+		this.addComponentListener(new ComponentAdapter() 
+		{  
+				public void componentResized(ComponentEvent evt) {
+					update();
+				}
+		});
 
     	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1280, 720);
@@ -179,7 +189,7 @@ public class ProffessorClient extends JFrame {
 			new Object[][] {
 			},
 			new String[] {
-				"Email", "Nombre", "Calificacion", "Asignatura"
+				"Id", "Asignatura", "Estudiante", "Calificación"
 			}
 		) {
 			Class<?>[] columnTypes = new Class[] {
@@ -223,9 +233,7 @@ public class ProffessorClient extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updateScore(Integer.parseInt(textID.getText()), 
-				Float.parseFloat(textScore.getText()), 
-                (SubjectData)subjectComboBox.getSelectedItem());
+				updateScore(Integer.parseInt(textID.getText()), Float.parseFloat(textScore.getText()));
 				update();
 			}
 		});
@@ -234,7 +242,7 @@ public class ProffessorClient extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				deleteScore(textID.getText());
+				// deleteScore(textID.getText());
 				update();
 			}
 		});
@@ -244,35 +252,38 @@ public class ProffessorClient extends JFrame {
 
 		DefaultTableModel myModel = (DefaultTableModel) table.getModel();
 		myModel.setRowCount(0);
-		List<ScoreData> scores = getScores();
+		scores = getScores();
 		for (ScoreData score : scores) {
 			System.out.println(user.getLogin());
 			Object[] data = {
 				score.getId(),
-				score.getScore(),
-				score.getStudent(),
-				score.getSubject()
+				score.getSubject().getName(),
+				score.getStudent().getLogin(),
+				score.getScore()
 			};
 
 			myModel.addRow(data);
         }
+		System.out.println(scores);
 		revalidate();
 		repaint();
 
 	}
 
-    private void updateScore(Integer id, Float Score, SubjectData subject){
+    private void updateScore(Integer id, Float Score){
 
-        UserData student = new UserData();
-		ScoreData scoData = new ScoreData();
-        scoData.setId(id);
+		ScoreData scoData = null;
+
+		for (ScoreData scoreData : scores) {
+			if (scoreData.getId().equals(id)) {
+				scoData = scoreData;
+			}
+		}
+
         scoData.setScore(Score);
-        scoData.setStudent(student);
-        scoData.setSubject(subject);
-	
+
 		WebTarget updateScoreWebTarget = webTarget.path("scores/" + textID.getText() + "/update")
-			.queryParam("login", student.getLogin()).queryParam("password", user.getPassword()).queryParam("0000", scoData.getId())
-			.queryParam("9", scoData.getScore());
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = updateScoreWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.put(Entity.entity(scoData, MediaType.APPLICATION_JSON));
@@ -286,7 +297,7 @@ public class ProffessorClient extends JFrame {
 	private void deleteScore(String email){
 	
 		WebTarget deleteScoreWebTarget = webTarget.path("scores/" + textID.getText() + "/delete")
-			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword()).queryParam("0000", score.getId());
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = deleteScoreWebTarget.request(MediaType.APPLICATION_JSON);
 
 		Response response = invocationBuilder.delete();
@@ -299,10 +310,9 @@ public class ProffessorClient extends JFrame {
 
 	private List<ScoreData> getScores(){
 
-		WebTarget getScoresWebTarget = webTarget.path("scores/" + textID.getText() + "/get")
-			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword()).queryParam("0000", score.getId());
+		WebTarget getScoresWebTarget = webTarget.path("scores")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = getScoresWebTarget.request(MediaType.APPLICATION_JSON);
-
 		Response response = invocationBuilder.get();
 		if (response.getStatus() != Status.OK.getStatusCode()) {
 			logger.error("Error connecting with the server. Code: {}", response.getStatus());
