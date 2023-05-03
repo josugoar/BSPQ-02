@@ -14,12 +14,15 @@ public class User {
 	String surname = null;
 	Role role = null;
 
+	public User() {
+	}
+
 	public User(String login, String password, String name, String surname, Role role) {
-		this.login = login;
-		this.password = password;
-		this.name = name;
-		this.surname = surname;
-		this.role = role;
+		setLogin(login);
+		setPassword(password);
+		setName(name);
+		setSurname(surname);
+		setRole(role);
 	}
 
 	public String getName() {
@@ -32,6 +35,9 @@ public class User {
 
 	public String getLogin() {
 		return this.login;
+	}
+	public void setLogin(String login) {
+		this.login = login;
 	}
 
 	public String getPassword() {
@@ -61,5 +67,53 @@ public class User {
 	public String toString() {
 		return "User: name --> " + this.name + ", surname --> " + this.surname + ", login -->" + this.login
 				+ ", password -->  " + this.password + "]";
+	}
+
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((login == null) ? 0 : login.hashCode());
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((surname == null) ? 0 : surname.hashCode());
+		result = prime * result + ((role == null) ? 0 : role.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (login == null) {
+			if (other.login != null)
+				return false;
+		} else if (!login.equals(other.login))
+			return false;
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (surname == null) {
+			if (other.surname != null)
+				return false;
+		} else if (!surname.equals(other.surname))
+			return false;
+		if (role != other.role)
+			return false;
+		return true;
 	}
 }
