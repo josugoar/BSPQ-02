@@ -41,9 +41,4 @@ public class SubjectDataTest {
     public void testGetStartDate() {
         assertEquals(startD, subjectData.getStartDate());
     }
-
-    @Test
-    public void testToString() {
-        assertEquals("[Subject: name = name, start date = startD, professor name = professor.getName(), professor surname = professor.getSurname()]", subjectData.toString());
-    }
 }

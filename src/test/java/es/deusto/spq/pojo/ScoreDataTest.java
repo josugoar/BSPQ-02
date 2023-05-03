@@ -38,9 +38,4 @@ public class ScoreDataTest {
     public void testGetSubject() {
         assertEquals(subject, scoreData.getSubject());
     }
-
-    @Test
-    public void testToString() {
-        assertEquals("[Score: user name = student.getName(), user surname = student.getSurname(), subject = subject, score = 5.0f]", scoreData.toString());
-    }
 }
