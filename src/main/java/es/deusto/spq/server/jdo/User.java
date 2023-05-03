@@ -14,12 +14,15 @@ public class User {
 	String surname = null;
 	Role role = null;
 
+	public User() {
+	}
+
 	public User(String login, String password, String name, String surname, Role role) {
-		this.login = login;
-		this.password = password;
-		this.name = name;
-		this.surname = surname;
-		this.role = role;
+		setLogin(login);
+		setPassword(password);
+		setName(name);
+		setSurname(surname);
+		setRole(role);
 	}
 
 	public String getName() {
@@ -32,6 +35,9 @@ public class User {
 
 	public String getLogin() {
 		return this.login;
+	}
+	public void setLogin(String login) {
+		this.login = login;
 	}
 
 	public String getPassword() {
@@ -109,5 +115,4 @@ public class User {
 		return true;
 	}
 
-	
 }

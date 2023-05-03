@@ -7,6 +7,9 @@ import javax.swing.JSplitPane;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -25,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.UserData;
 import es.deusto.spq.pojo.SubjectData;
@@ -218,9 +222,11 @@ public class ProfessorClient extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updateUserScore(Integer.parseInt(textID.getText()), 
+				updateScore(Integer.parseInt(textID.getText()), 
 				Float.parseFloat(textScore.getText()), 
                 (SubjectData)subjectComboBox.getSelectedItem());
+
+				update();
 			}
 		});
 
@@ -228,13 +234,13 @@ public class ProfessorClient extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				textID.setText("");
-				textScore.setText("");
+				deleteScore(textID.getText());
+				update();
 			}
 		});
     }
 
-    private void updateUserScore(Integer id, Float Score, SubjectData subject){
+    private void updateScore(Integer id, Float Score, SubjectData subject){
 
         UserData student = new UserData();
 		ScoreData scoData = new ScoreData();
@@ -254,4 +260,70 @@ public class ProfessorClient extends JFrame {
 			logger.info("User correctly updated");
 		}
 	}
+
+	private void update() {
+
+		DefaultTableModel myModel = (DefaultTableModel) table.getModel();
+		myModel.setRowCount(0);
+		List<ScoreData> scores = getScores();
+		for (ScoreData score : scores) {
+			System.out.println(user.getLogin());
+			Object[] data = {
+				score.getId(),
+				score.getScore(),
+				score.getStudent(),
+				score.getSubject()
+			};
+
+			myModel.addRow(data);
+        }
+		revalidate();
+		repaint();
+
+	}
+
+	private void deleteScore(String email){
+	
+		WebTarget registerUserWebTarget = webTarget.path("users/" + email + "/delete")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.delete();
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+	}
+
+	private List<ScoreData> getScores(){
+
+		WebTarget registerUserWebTarget = webTarget.path("users")
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.get();
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+		return Arrays.asList(response.readEntity(ScoreData[].class));
+	}
+
+	/* 
+	private UserData getScore(String email) {
+		WebTarget registerUserWebTarget = webTarget.path(email)
+			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
+		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+
+		Response response = invocationBuilder.get();
+		if (response.getStatus() != Status.OK.getStatusCode()) {
+			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+		} else {
+			logger.info("User correctly updated");
+		}
+		return response.readEntity(UserData.class);
+	}
+	*/
 }

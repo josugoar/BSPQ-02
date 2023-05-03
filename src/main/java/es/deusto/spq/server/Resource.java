@@ -116,16 +116,19 @@ public class Resource {
 			tx.begin();
 			logger.info("Creating query ...");
 
-			try (Query<?> q = pm.newQuery("SELECT FROM " + User.class.getName() + " WHERE login == \""
-					+ logIn + "\" &&  password == \""
-					+ password + "\"")) {
-				q.setUnique(true);
-				user = (User) q.execute();
-
-				logger.info("User retrieved: {}", user);
-			} catch (Exception e) {
-				e.printStackTrace();
+			try {
+				user = pm.getObjectById(User.class, logIn);
+				if (user != null) {
+					if (!password.equals(user.getPassword())) {
+						user = null;
+					} else {
+						logger.info("User retrieved: {}", user);
+					}
+				}
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
 			}
+
 			tx.commit();
 		} finally {
 			if (tx.isActive()) {
@@ -227,8 +230,8 @@ public class Resource {
 			User user = null;
 			try {
 				user = pm.getObjectById(User.class, userData.getLogin());
-			} catch (javax.jdo.JDOObjectNotFoundException jonfe) {
-				logger.info("Exception launched: {}", jonfe.getMessage());
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				logger.info("Exception launched: {}", e.getMessage());
 			}
 			logger.info("User: {}", user);
 			if (user != null) {

@@ -71,7 +71,7 @@ public class ScoreTest {
     @Test
     public void testSetSubject() {
         Subject newSubject = new Subject(new Date(1000), "test-name2", professor, 10);
-        score.setId(10);
+        score.setSubject(newSubject);
         assertEquals(newSubject, score.getSubject());
     }
     
