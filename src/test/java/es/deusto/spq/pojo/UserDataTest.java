@@ -30,7 +30,7 @@ public class UserDataTest {
 
     @Test
     public void testGetLogin() {
-        assertEquals("long", userData.getLogin());
+        assertEquals("login", userData.getLogin());
     }
 
     @Test
