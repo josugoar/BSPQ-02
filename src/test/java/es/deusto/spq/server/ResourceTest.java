@@ -25,8 +25,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import es.deusto.spq.pojo.Role;
+import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.SubjectData;
 import es.deusto.spq.pojo.UserData;
+import es.deusto.spq.server.jdo.Score;
 import es.deusto.spq.server.jdo.Subject;
 import es.deusto.spq.server.jdo.User;
 
@@ -47,6 +49,15 @@ public class ResourceTest {
     @Mock
     private Query<Subject> querySubject;
 
+    @Mock
+    private Query<Score> queryScore;
+
+    User adminUser;
+    User deanUser;
+    User studentUser;
+    User proffessorUser;
+    User fakeProffessor;
+
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -61,18 +72,35 @@ public class ResourceTest {
             resource = new Resource();
         }
 
-        User user1 = spy(User.class);
-        when(user1.getLogin()).thenReturn("test-admin");
-        when(user1.getPassword()).thenReturn("test-admin");
-        when(user1.getRole()).thenReturn(Role.ADMIN);
-        when(persistenceManager.getObjectById(User.class, "test-admin")).thenReturn(user1);
+        adminUser = spy(User.class);
+        when(adminUser.getLogin()).thenReturn("test-admin");
+        when(adminUser.getPassword()).thenReturn("test-admin");
+        when(adminUser.getRole()).thenReturn(Role.ADMIN);
+        when(persistenceManager.getObjectById(User.class, "test-admin")).thenReturn(adminUser);
 
-        User user2 = spy(User.class);
-        when(user2.getLogin()).thenReturn("test-dean");
-        when(user2.getPassword()).thenReturn("test-dean");
-        when(user2.getRole()).thenReturn(Role.DEAN);
-        when(persistenceManager.getObjectById(User.class, "test-dean")).thenReturn(user2);
-        
+        deanUser = spy(User.class);
+        when(deanUser.getLogin()).thenReturn("test-dean");
+        when(deanUser.getPassword()).thenReturn("test-dean");
+        when(deanUser.getRole()).thenReturn(Role.DEAN);
+        when(persistenceManager.getObjectById(User.class, "test-dean")).thenReturn(deanUser);
+
+        studentUser = spy(User.class);
+        when(studentUser.getLogin()).thenReturn("test-student");
+        when(studentUser.getPassword()).thenReturn("test-student");
+        when(studentUser.getRole()).thenReturn(Role.STUDENT);
+        when(persistenceManager.getObjectById(User.class, "test-student")).thenReturn(studentUser);
+
+        proffessorUser = spy(User.class);
+        when(proffessorUser.getLogin()).thenReturn("test-proffessor");
+        when(proffessorUser.getPassword()).thenReturn("test-proffessor");
+        when(proffessorUser.getRole()).thenReturn(Role.PROFFESSOR);
+        when(persistenceManager.getObjectById(User.class, "test-proffessor")).thenReturn(proffessorUser);
+
+        fakeProffessor = spy(User.class);
+        when(fakeProffessor.getLogin()).thenReturn("fake-proffessor");
+        when(fakeProffessor.getPassword()).thenReturn("fake-proffessor");
+        when(fakeProffessor.getRole()).thenReturn(Role.PROFFESSOR);
+        when(persistenceManager.getObjectById(User.class, "fake-proffessor")).thenReturn(fakeProffessor);        
     }
 
     @Test
@@ -290,7 +318,7 @@ public class ResourceTest {
         subjectData.setProffessor(proffessor);
         subjectData.setId(1);
 
-        Response response1 = resource.updateSubject("test-dean", "test-dean", subjectData.getId(), subjectData);
+        Response response1 = resource.deleteSubject("test-dean", "test-dean", subjectData.getId());
 
         assertEquals(Response.Status.NOT_FOUND, response1.getStatusInfo());
 
@@ -298,6 +326,141 @@ public class ResourceTest {
         when(persistenceManager.getObjectById(Subject.class, subjectData.getId())).thenReturn(subject);
 
         Response response2 = resource.deleteSubject("test-dean", "test-dean", subjectData.getId());
+
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+    }
+    
+        @Test
+    public void testGetScore() {
+        Subject subject1 = new Subject();
+        subject1.setId(1);
+        subject1.setProffessor(proffessorUser);
+
+        Subject subject2 = new Subject();
+        subject2.setId(2);
+        subject2.setProffessor(proffessorUser);
+
+        Subject subject3 = new Subject();
+        subject3.setId(3);
+        subject3.setProffessor(fakeProffessor);
+
+        Score score1 = new Score(
+            subject1,
+            studentUser,
+            8.3f, 
+            1);
+
+        Score score2 = new Score(
+            subject2,
+            studentUser,
+            8.3f, 
+            2);
+        
+        Score score3 = new Score(
+            subject3,
+            studentUser,
+            8.3f, 
+            3);
+        List<Score> scorelist = new ArrayList<>();
+        scorelist.add(score1);
+        scorelist.add(score2);
+        scorelist.add(score3);
+
+        when(persistenceManager.newQuery(Score.class)).thenReturn(queryScore);
+        when(queryScore.executeList()).thenReturn(scorelist);
+
+        Response response1 = resource.getScore("test-student", "test-student");
+
+        assertEquals(Response.Status.OK, response1.getStatusInfo());
+        assertEquals(3, ((ScoreData[])response1.getEntity()).length);
+
+        Response response2 = resource.getScore("test-proffessor", "test-proffessor");
+
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+        assertEquals(2, ((ScoreData[])response2.getEntity()).length);
+    }
+
+    @Test
+    public void testRegisterScore() {
+        SubjectData subjectData = new SubjectData();
+        subjectData.setId(1);
+        subjectData.setProffessor(new UserData(proffessorUser));
+
+        ScoreData scoreData = new ScoreData();
+        scoreData.setId(1);
+        scoreData.setScore(8.3f);
+        scoreData.setStudent(new UserData(studentUser));
+        scoreData.setSubject(subjectData);
+
+        Response response1 = resource.registerScore("test-admin", "test-admin", new ScoreData());
+
+        assertEquals(Response.Status.BAD_REQUEST, response1.getStatusInfo());
+
+        Response response2 = resource.registerScore("test-dean", "test-dean", scoreData);
+
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+
+        Score score = spy(Score.class);
+        when(persistenceManager.getObjectById(Score.class, scoreData.getId())).thenReturn(score);
+
+        Response response3 = resource.registerScore("test-admin", "test-admin", scoreData);
+
+        assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
+    }
+
+    @Test
+    public void testUpdateScore() {
+        SubjectData subjectData = new SubjectData();
+        subjectData.setId(1);
+        subjectData.setProffessor(new UserData(proffessorUser));
+
+        ScoreData scoreData = new ScoreData();
+        scoreData.setId(1);
+        scoreData.setScore(8.3f);
+        scoreData.setStudent(new UserData(studentUser));
+        scoreData.setSubject(subjectData);
+        
+        Response response1 = resource.updateScore("test-proffessor", "test-proffessor", 1, scoreData);
+        
+        assertEquals(Response.Status.NOT_FOUND, response1.getStatusInfo());
+
+        Score score = spy(Score.class);
+        when(score.getId()).thenReturn(scoreData.getId());
+        when(score.getScore()).thenReturn(scoreData.getScore());
+        when(score.getStudent()).thenReturn(null);
+        when(persistenceManager.getObjectById(Score.class, scoreData.getId())).thenReturn(score);
+
+        when(persistenceManager.getObjectById(Score.class, scoreData.getId())).thenReturn(score);
+
+        Response response2 = resource.updateScore("test-proffessor", "test-proffessor", 1, scoreData);
+
+        ArgumentCaptor<Float> scoreCaptor = ArgumentCaptor.forClass(Float.class);
+        verify(score).setScore(scoreCaptor.capture());
+        assertEquals(scoreData.getScore(), scoreCaptor.getValue());
+
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+    }
+
+    @Test
+    public void testDeleteScore() {
+        SubjectData subjectData = new SubjectData();
+        subjectData.setId(1);
+        subjectData.setProffessor(new UserData(proffessorUser));
+
+        ScoreData scoreData = new ScoreData();
+        scoreData.setId(1);
+        scoreData.setScore(8.3f);
+        scoreData.setStudent(new UserData(studentUser));
+        scoreData.setSubject(subjectData);
+
+        Response response1 = resource.deleteScore("test-dean", "test-dean", scoreData.getId());
+
+        assertEquals(Response.Status.NOT_FOUND, response1.getStatusInfo());
+
+        Subject subject = spy(Subject.class);
+        when(persistenceManager.getObjectById(Subject.class, scoreData.getId())).thenReturn(subject);
+
+        Response response2 = resource.deleteSubject("test-dean", "test-dean", scoreData.getId());
 
         assertEquals(Response.Status.OK, response2.getStatusInfo());
     }

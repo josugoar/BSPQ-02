@@ -176,28 +176,17 @@ public class Resource {
 			Query<User> q = pm.newQuery(User.class);
 			users = q.executeList();
 			
-			if (users != null) {
-				for (User user : users) {
-					UserData usdat = new UserData(user);
-					usersdat.add(usdat);
-				}
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.OK).entity(usersdat.toArray(new UserData[0])).build();
-			} else {
-				logger.info("Users not found");
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.NOT_FOUND).build();
+			for (User user : users) {
+				UserData usdat = new UserData(user);
+				usersdat.add(usdat);
 			}
+			try {
+				q.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tx.commit();
+			return Response.status(Status.OK).entity(usersdat.toArray(new UserData[0])).build();
 		} finally {
 			if (tx.isActive()) {
 				tx.rollback();
@@ -450,28 +439,17 @@ public class Resource {
 			Query<Subject> q = pm.newQuery(Subject.class);
 			subjects = q.executeList();
 			
-			if (subjects != null) {
-				for (Subject subject : subjects) {
-					SubjectData subjectdat = new SubjectData(subject);
-					subjectsdat.add(subjectdat);
-				}
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.OK).entity(subjectsdat.toArray(new SubjectData[0])).build();
-			} else {
-				logger.info("Users not found");
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.NOT_FOUND).build();
+			for (Subject subject : subjects) {
+				SubjectData subjectdat = new SubjectData(subject);
+				subjectsdat.add(subjectdat);
 			}
+			try {
+				q.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tx.commit();
+			return Response.status(Status.OK).entity(subjectsdat.toArray(new SubjectData[0])).build();
 		} finally {
 			if (tx.isActive()) {
 				tx.rollback();
@@ -683,44 +661,34 @@ public class Resource {
 			Query<Score> q = pm.newQuery(Score.class);
 			scores = q.executeList();
 			
-			if (scores != null) {
-				for (Score score : scores) {
-					ScoreData scoredat = new ScoreData(score);
-					switch (user.getRole()) {
-						case STUDENT:
-							if (score.getStudent().getLogin().equals(user.getLogin())) {
-								scoresdata.add(scoredat);
-							}
-							break;
-						case PROFFESSOR:
-							if (score.getSubject().getProffessor().getLogin().equals(user.getLogin())) {
-								scoresdata.add(scoredat);
-							}
-							break;
-						case DEAN:
+			for (Score score : scores) {
+				ScoreData scoredat = new ScoreData(score);
+				switch (user.getRole()) {
+					case STUDENT:
+						if (score.getStudent().getLogin().equals(logIn)) {
 							scoresdata.add(scoredat);
-							break;
-						default:
-							break;
-					}
+						}
+						break;
+					case PROFFESSOR:
+						if (score.getSubject().getProffessor().getLogin().equals(logIn)) {
+							scoresdata.add(scoredat);
+						}
+						break;
+					case DEAN:
+					case ADMIN:
+						scoresdata.add(scoredat);
+						break;
+					default:
+						break;
 				}
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.OK).entity(scoresdata.toArray(new ScoreData[0])).build();
-			} else {
-				logger.info("Scores not found");
-				try {
-					q.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				tx.commit();
-				return Response.status(Status.NOT_FOUND).build();
 			}
+			try {
+				q.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			tx.commit();
+			return Response.status(Status.OK).entity(scoresdata.toArray(new ScoreData[0])).build();
 		} finally {
 			if (tx.isActive()) {
 				tx.rollback();
