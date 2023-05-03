@@ -10,7 +10,7 @@ public class UserTest {
 
     @Before
     public void setUp() {
-        user = new User("test-login", "test-password", "test-name", "test-surnmame", Role.STUDENT);
+        user = new User("test-login", "test-password", "test-name", "test-surname", Role.STUDENT);
     }
 
     @Test
