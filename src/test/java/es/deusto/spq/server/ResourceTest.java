@@ -1,6 +1,5 @@
 package es.deusto.spq.server;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -11,7 +10,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Transaction;
-import javax.jdo.Query;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
@@ -22,7 +20,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.UserData;
 import es.deusto.spq.server.jdo.User;
 
@@ -85,19 +82,20 @@ public class ResourceTest {
         userData.setLogin("test-login");
         userData.setPassword("passwd");
 
+        // call tested method
+        Response response1 = resource.registerUser(userData);
+
+        // check expected response
+        assertEquals(Response.Status.OK, response1.getStatusInfo());
+
         // simulate that 
         User user = spy(User.class);
         when(persistenceManager.getObjectById(User.class, userData.getLogin())).thenReturn(user);
 
         // call tested method
-        Response response = resource.registerUser(userData);
-
-        // check that the user is set by the code with the password
-        ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
-        verify(user).setPassword(passwordCaptor.capture());
-        assertEquals("passwd", passwordCaptor.getValue());
+        Response response2 = resource.registerUser(userData);
 
         // check expected response
-        assertEquals(Response.Status.OK, response.getStatusInfo());
+        assertEquals(Response.Status.BAD_REQUEST, response2.getStatusInfo());
     }
 }
