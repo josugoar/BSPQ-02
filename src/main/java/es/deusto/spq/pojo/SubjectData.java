@@ -45,7 +45,8 @@ public class SubjectData {
     public void setId(Integer id) {
         this.id = id;
     }
-
+    
+    @ExcludeFromJacocoGeneratedReport
     public String toString() {
 		return "Subject: name --> " + this.name + ", start date --> " + this.startDate + ", proffessor name -->" + this.proffessor.getName()
 				+ ", proffessor surname -->" + this.proffessor.getSurname() +", id -->  " + this.id + "]";
