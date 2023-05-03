@@ -55,43 +55,28 @@ public class ResourceTest {
     }
 
     @Test
-    public void testGetUsers() {
-        // prepare a mock query object to be returned by
-        // mock persistence manager
-        @SuppressWarnings("unchecked") Query<User> query = mock(Query.class);
-        when(persistenceManager.newQuery(User.class)).thenReturn(query);
-        
-        // prepare response when execute method on mock Query object is
-        // is called with expected parameters
-        User user = new User("test-login", "passwd", "Juan", "Alfaro", Role.STUDENT);
-        when(query.execute(user.getLogin(), user.getPassword())).thenReturn(user);
-        
-        UserData usdat = new UserData(user);
-        UserData[] usdats = {usdat};
+    public void testLogin() {
+        // prepare mock Persistence Manager to return User
+        UserData userData = new UserData();
+        userData.setLogin("test-login");
+        userData.setPassword("passwd");
 
-        // prepare mock transaction behaviour
-        when(transaction.isActive()).thenReturn(false);
+        // simulate that 
+        User user = spy(User.class);
+        when(persistenceManager.getObjectById(User.class, userData.getLogin())).thenReturn(user);
 
         // call tested method
-        Response response = resource.getUsers(user.getLogin(), user.getPassword());
-        
-         /* TODO
-        //verify that the filter is set with the correct value
-        ArgumentCaptor<String> filterCaptor = ArgumentCaptor.forClass(String.class);
-        verify(query).setFilter(filterCaptor.capture());
-        assertEquals("this.login == :login && this.password == :password", filterCaptor.getValue());
+        Response response = resource.login(userData.getLogin(), userData.getPassword());
 
-        //verify that the unique is set to true
-        ArgumentCaptor<Boolean> uniqueCaptor = ArgumentCaptor.forClass(Boolean.class);
-        verify(query).setUnique(uniqueCaptor.capture());
-        assertTrue(uniqueCaptor.getValue());
-        */
+        // check that the user is set by the code with the password
+        ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+        verify(user).setPassword(passwordCaptor.capture());
+        assertEquals("passwd", passwordCaptor.getValue());
 
         // check expected response
         assertEquals(Response.Status.OK, response.getStatusInfo());
-        UserData[] responseData = (UserData[]) response.getEntity();
-        assertArrayEquals(usdats, responseData);
     }
+
 
     @Test
     public void testRegisterUser() {
