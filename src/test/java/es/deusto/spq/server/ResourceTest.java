@@ -18,6 +18,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.UserData;
 import es.deusto.spq.server.jdo.User;
 
