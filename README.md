@@ -13,7 +13,7 @@ Make sure that the database was correctly configured. Use the contents of the fi
 
       mysql -p --user root < sql/create-learnify.sql
 
-Alternatively, on Windows, enter MySQL shell with root with the following command
+Alternatively, on Windows, enter MySQL shell with root with the following command:
 
       mysql -p --user root
       source sql/create-learnify.sql
