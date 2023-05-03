@@ -77,7 +77,6 @@ public class ResourceTest {
         assertEquals(Response.Status.OK, response.getStatusInfo());
     }
 
-
     @Test
     public void testRegisterUser() {
         // prepare mock Persistence Manager to return User
@@ -100,4 +99,37 @@ public class ResourceTest {
         // check expected response
         assertEquals(Response.Status.OK, response.getStatusInfo());
     }
+
+    @Test
+    public void testGetUser() {
+        UserData userData1 = new UserData();
+        userData1.setLogin("test-login");
+        userData1.setPassword("passwd");
+        userData1.setRole(Role.ADMIN);
+
+        User user1 = spy(User.class);
+        when(user1.getLogin()).thenReturn(userData1.getLogin());
+        when(user1.getPassword()).thenReturn(userData1.getPassword());
+        when(user1.getRole()).thenReturn(userData1.getRole());
+        when(persistenceManager.getObjectById(User.class, userData1.getLogin())).thenReturn(user1);
+
+        Response response1 = resource.getUser(userData1.getLogin(), userData1.getPassword(), "nonexistent");
+
+        assertEquals(Response.Status.BAD_REQUEST, response1.getStatusInfo());
+
+        UserData userData2 = new UserData();
+        userData2.setLogin("test-login2");
+        userData2.setPassword("password");
+        userData1.setRole(Role.STUDENT);
+
+        User user2 = spy(User.class);
+        when(persistenceManager.getObjectById(User.class, userData2.getLogin())).thenReturn(user2);
+
+        Response response2 = resource.getUser(userData1.getLogin(), userData1.getPassword(), user2.getLogin());
+
+        // check expected response
+        assertEquals(Response.Status.OK, response2.getStatusInfo());
+    }
+
+
 }
