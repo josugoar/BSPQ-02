@@ -61,6 +61,7 @@ public class UserData {
         this.role = role;
     }
 
+    @ExcludeFromJacocoGeneratedReport
     public String toString() {
         return "[login=" + login + ", password=" + password + "]";
     }

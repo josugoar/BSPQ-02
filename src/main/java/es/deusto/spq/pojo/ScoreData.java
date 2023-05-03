@@ -50,6 +50,7 @@ public class ScoreData {
         this.id = id;
     }
 
+    @ExcludeFromJacocoGeneratedReport
     public String toString() {
 		return "Score: user name --> " + this.student.getName() + ", user surname --> " + this.student.getSurname() + ", subject -->" + this.subject
 				+ ", score -->  " + this.score + "]";
