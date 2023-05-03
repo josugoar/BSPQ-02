@@ -399,19 +399,18 @@ public class AdminClient extends JFrame {
 	}
 
 	private void createUser(String email, String password, String name, String surname, Role role){
-
-		UserData user = new UserData();
-		user.setLogin(email);
-		user.setPassword(password);
-		user.setName(name);
-		user.setSurname(surname);
-		user.setRole(role);
+		UserData currentUser = new UserData();
+		currentUser.setLogin(email);
+		currentUser.setPassword(password);
+		currentUser.setName(name);
+		currentUser.setSurname(surname);
+		currentUser.setRole(role);
 	
 		WebTarget registerUserWebTarget = webTarget.path("users")
 			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
-		Response response = invocationBuilder.post(Entity.entity(user, MediaType.APPLICATION_JSON));
+		Response response = invocationBuilder.post(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
 		if (response.getStatus() != Status.OK.getStatusCode()) {
 			logger.error("Error connecting with the server. Code: {}", response.getStatus());
 		} else {
@@ -421,19 +420,18 @@ public class AdminClient extends JFrame {
 	}
 
 	private void updateUser(String email, String password, String name, String surname, Role role){
-
-		UserData user = new UserData();
-		user.setLogin(email);
-		user.setPassword(password);
-		user.setName(name);
-		user.setSurname(surname);
-		user.setRole(role);
+		UserData currentUser = new UserData();
+		currentUser.setLogin(email);
+		currentUser.setPassword(password);
+		currentUser.setName(name);
+		currentUser.setSurname(surname);
+		currentUser.setRole(role);
 	
 		WebTarget registerUserWebTarget = webTarget.path("users/" + email + "/update")
 			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
-		Response response = invocationBuilder.put(Entity.entity(user, MediaType.APPLICATION_JSON));
+		Response response = invocationBuilder.put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
 		if (response.getStatus() != Status.OK.getStatusCode()) {
 			logger.error("Error connecting with the server. Code: {}", response.getStatus());
 		} else {
@@ -442,7 +440,6 @@ public class AdminClient extends JFrame {
 	}
 
 	private void deleteUser(String email){
-	
 		WebTarget registerUserWebTarget = webTarget.path("users/" + email + "/delete")
 			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
@@ -456,7 +453,6 @@ public class AdminClient extends JFrame {
 	}
 
 	private List<UserData> getUsers(){
-
 		WebTarget registerUserWebTarget = webTarget.path("users")
 			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
@@ -471,7 +467,7 @@ public class AdminClient extends JFrame {
 	}
 
 	private UserData getUser(String email) {
-		WebTarget registerUserWebTarget = webTarget.path(email)
+		WebTarget registerUserWebTarget = webTarget.path("users/" + email + "/get")
 			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
 		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 

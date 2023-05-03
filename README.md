@@ -36,17 +36,7 @@ Run the following command to create the data.
 On Windows:
 
       mysql -p --user root
-      source sql/create-data.sql     
-
-Integration tests can be launched using the following command. An embedded Grizzly HTTP server will be launched to perform real calls
-to the REST API and to the MySQL database.
-
-      mvn verify -Pintegration-tests
-
-Performance tests can be launched using the following command. In this example, these tests are the same integration tests but executed
-multiple times to calculate some statistics
-
-      mvn verify -Pperformance-tests
+      source sql/create-data.sql  
 
 To launch the server run the command
 
