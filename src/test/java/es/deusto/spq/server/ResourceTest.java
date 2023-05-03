@@ -46,6 +46,12 @@ public class ResourceTest {
 
             resource = new Resource();
         }
+
+        User user1 = spy(User.class);
+        when(user1.getLogin()).thenReturn("test-admin");
+        when(user1.getPassword()).thenReturn("test-admin");
+        when(user1.getRole()).thenReturn(Role.ADMIN);
+        when(persistenceManager.getObjectById(User.class, "test-admin")).thenReturn(user1);
     }
 
     @Test
@@ -87,33 +93,29 @@ public class ResourceTest {
 
     @Test
     public void testGetUser() {
-        UserData userData1 = new UserData();
-        userData1.setLogin("test-login");
-        userData1.setPassword("passwd");
-        userData1.setRole(Role.ADMIN);
-
-        User user1 = spy(User.class);
-        when(user1.getLogin()).thenReturn(userData1.getLogin());
-        when(user1.getPassword()).thenReturn(userData1.getPassword());
-        when(user1.getRole()).thenReturn(userData1.getRole());
-        when(persistenceManager.getObjectById(User.class, userData1.getLogin())).thenReturn(user1);
-
-        Response response1 = resource.getUser(userData1.getLogin(), userData1.getPassword(), "nonexistent");
+        Response response1 = resource.getUser("test-admin", "test-admin", "nonexistent");
 
         assertEquals(Response.Status.BAD_REQUEST, response1.getStatusInfo());
 
-        UserData userData2 = new UserData();
-        userData2.setLogin("test-login2");
-        userData2.setPassword("password");
-        userData1.setRole(Role.STUDENT);
+        UserData userData = new UserData();
+        userData.setLogin("test-user");
+        userData.setPassword("password");
+        userData.setRole(Role.ADMIN);
 
         User user2 = spy(User.class);
-        when(persistenceManager.getObjectById(User.class, userData2.getLogin())).thenReturn(user2);
+        when(persistenceManager.getObjectById(User.class, userData.getLogin())).thenReturn(user2);
 
-        Response response2 = resource.getUser(userData1.getLogin(), userData1.getPassword(), user2.getLogin());
+        Response response2 = resource.getUser("test-admin", "test-admin", user2.getLogin());
 
-        // check expected response
         assertEquals(Response.Status.OK, response2.getStatusInfo());
+
+        Response response3 = resource.getUser("test-admin", "no-admin", user2.getLogin());
+
+        assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
+
+        Response response4 = resource.getUser("no-admin", "no-admin", user2.getLogin());
+
+        assertEquals(Response.Status.BAD_REQUEST, response4.getStatusInfo());
     }
 
 
