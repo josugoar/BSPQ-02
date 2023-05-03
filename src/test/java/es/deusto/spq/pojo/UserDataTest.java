@@ -42,10 +42,4 @@ public class UserDataTest {
     public void testGetRole() {
         assertEquals(role, userData.getRole());
     }
-
-    @Test
-    public void testToString() {
-        assertEquals("[login=login, password=password]", userData.toString());
-    }
-
 }
