@@ -1,0 +1,24 @@
+volumes:
+    db_data:
+
+services:
+    database:
+        image: mysql:8.0.25
+        container_name: database
+        volumes:      
+        - db_data:/var/lib/mysql
+        - ./sql:/docker-entrypoint-initdb.d
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: learnifyDB
+            MYSQL_USER: spq
+            MYSQL_PASSWORD: spq 
+    server:
+        container_name: server
+        depends_on:
+        - database
+        build: .
+        ports:
+        - "9080:8080"
+        restart: always
