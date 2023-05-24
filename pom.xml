@@ -218,6 +218,33 @@
 					<excludedGroups>categories.IntegrationTest, categories.PerformanceTest</excludedGroups>
         		</configuration>
       		</plugin>
+			<plugin>
+                <groupId>de.oscillation.maven</groupId>
+                <artifactId>doxygen-maven-plugin</artifactId>
+                <version>0.1.0</version>
+                <configuration>
+                    <workingDirectory>${basedir}</workingDirectory>
+                    <executable>doxygen</executable>
+                    <doxyfile>Doxyfile</doxyfile>
+                    <autogen>true</autogen>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 
