@@ -38,6 +38,15 @@ On Windows:
       mysql -p --user root
       source sql/create-data.sql  
 
+Integration tests can be launched using the following command. An embedded Grizzly HTTP server will be launched to perform real calls
+to the REST API and to the MySQL database.
+
+      mvn verify -Pintegration-tests
+
+Performance tests can be launched using the following command.
+
+      mvn verify -Pperformance-tests
+
 To launch the server run the command
 
       mvn jetty:run
