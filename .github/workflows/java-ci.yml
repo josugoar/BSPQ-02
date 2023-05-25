@@ -22,7 +22,6 @@ jobs:
   build:
     needs: prepare-matrix
     runs-on: ubuntu-latest
-    runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJson(needs.prepare-matrix.outputs.matrix)}}
     defaults:
