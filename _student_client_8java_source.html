@@ -143,26 +143,26 @@ $(document).ready(function(){initNavTree('_student_client_8java_source.html','')
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        column.add(<span class="stringliteral">&quot;Subject&quot;</span>);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        column.add(<span class="stringliteral">&quot;Proffessor&quot;</span>);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        column.add(<span class="stringliteral">&quot;Score&quot;</span>);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        JTable table = <span class="keyword">new</span> JTable(data, column);</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        table.setEnabled(<span class="keyword">false</span>);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        table.setColumnSelectionAllowed(<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        scrollPane.setViewportView(table);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        JPanel panel = <span class="keyword">new</span> JPanel();</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        scrollPane.setColumnHeaderView(panel);</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        this.setDefaultCloseOperation(EXIT_ON_CLOSE);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        this.setSize(600,500);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        this.setSize(600, 500);</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        setLayout(<span class="keyword">new</span> BoxLayout(getContentPane(), BoxLayout.Y_AXIS));</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        JPanel loginPanel = <span class="keyword">new</span> JPanel();</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        JLabel loginKeyLabel = <span class="keyword">new</span> JLabel(<span class="stringliteral">&quot;Login&quot;</span>);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        JLabel loginValueLabel = <span class="keyword">new</span> JLabel(userData.<a class="code" href="classes_1_1deusto_1_1spq_1_1pojo_1_1_user_data.html#a620a7d9f6b4ca880cd8e501c5088d8c7">getLogin</a>());</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        loginPanel.add(loginKeyLabel);</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        loginPanel.add(loginValueLabel);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        JPanel passwordPanel = <span class="keyword">new</span> JPanel();</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        JLabel passwordKeyLabel = <span class="keyword">new</span> JLabel(<span class="stringliteral">&quot;Password&quot;</span>);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        JLabel passwordValueLabel = <span class="keyword">new</span> JLabel(userData.<a class="code" href="classes_1_1deusto_1_1spq_1_1pojo_1_1_user_data.html#a22232ab098c2a22b7fd5122ee133ba17">getPassword</a>());</div>
@@ -189,9 +189,9 @@ $(document).ready(function(){initNavTree('_student_client_8java_source.html','')
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        add(panel);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keyword">private</span> List&lt;ScoreData&gt; getScores(){</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keyword">private</span> List&lt;ScoreData&gt; getScores() {</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        WebTarget registerUserWebTarget = webTarget.path(<span class="stringliteral">&quot;scores&quot;</span>)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            .queryParam(<span class="stringliteral">&quot;login&quot;</span>, user.<a class="code" href="classes_1_1deusto_1_1spq_1_1pojo_1_1_user_data.html#a620a7d9f6b4ca880cd8e501c5088d8c7">getLogin</a>()).queryParam(<span class="stringliteral">&quot;password&quot;</span>, user.<a class="code" href="classes_1_1deusto_1_1spq_1_1pojo_1_1_user_data.html#a22232ab098c2a22b7fd5122ee133ba17">getPassword</a>());</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                .queryParam(<span class="stringliteral">&quot;login&quot;</span>, user.<a class="code" href="classes_1_1deusto_1_1spq_1_1pojo_1_1_user_data.html#a620a7d9f6b4ca880cd8e501c5088d8c7">getLogin</a>()).queryParam(<span class="stringliteral">&quot;password&quot;</span>, user.<a class="code" href="classes_1_1deusto_1_1spq_1_1pojo_1_1_user_data.html#a22232ab098c2a22b7fd5122ee133ba17">getPassword</a>());</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        Response response = invocationBuilder.get();</div>
@@ -221,7 +221,7 @@ $(document).ready(function(){initNavTree('_student_client_8java_source.html','')
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_5eb159725f84c66aafd839904a4acdd0.html">main</a></li><li class="navelem"><a class="el" href="dir_fd3f6763802dee1ad875f6c80eac0bda.html">java</a></li><li class="navelem"><a class="el" href="dir_f9b1e2a59d62d001356ff527358589e3.html">es</a></li><li class="navelem"><a class="el" href="dir_218602b84a76f1dba535b3f8d119ec0a.html">deusto</a></li><li class="navelem"><a class="el" href="dir_7df73947654fe6d5c668d5365112078e.html">spq</a></li><li class="navelem"><a class="el" href="dir_27ce4894bdf09bf390559ac5fcdaf0e2.html">client</a></li><li class="navelem"><a class="el" href="_student_client_8java.html">StudentClient.java</a></li>
-    <li class="footer">Generated on Thu May 25 2023 11:39:51 for Learnify by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Thu May 25 2023 14:02:23 for Learnify by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>
