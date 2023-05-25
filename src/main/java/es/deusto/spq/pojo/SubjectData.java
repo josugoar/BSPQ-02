@@ -10,6 +10,7 @@ public class SubjectData {
     private String name;
     private UserData proffessor;
     private Integer id;
+    private Faculty faculty;
 
     public SubjectData(){
     }
@@ -19,6 +20,7 @@ public class SubjectData {
         this.name = subject.getName();
         this.proffessor = new UserData(subject.getProffessor());
         this.id = subject.getId();
+        this.faculty = subject.getFaculty();
     }
 
     public Date getStartDate() {
@@ -45,11 +47,17 @@ public class SubjectData {
     public void setId(Integer id) {
         this.id = id;
     }
+    public Faculty getFaculty() {
+        return faculty;
+    }
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
+    }
     
     @ExcludeFromJacocoGeneratedReport
     public String toString() {
 		return "Subject: name --> " + this.name + ", start date --> " + this.startDate + ", proffessor name -->" + this.proffessor.getName()
-				+ ", proffessor surname -->" + this.proffessor.getSurname() +", id -->  " + this.id + "]";
+				+ ", proffessor surname -->" + this.proffessor.getSurname() + ", id -->  " + this.id + ", faculty -->  " + this.faculty + "]";
 	}
 
 }

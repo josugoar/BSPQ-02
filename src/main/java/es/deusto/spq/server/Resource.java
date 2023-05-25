@@ -497,7 +497,7 @@ public class Resource {
 				UserData proffessor = subjectData.getProffessor();
 				subject = new Subject(subjectData.getStartDate(), subjectData.getName(), 
 				new User(proffessor.getLogin(), proffessor.getPassword(), proffessor.getName(), proffessor.getSurname(), proffessor.getRole()),
-				subjectData.getId());
+				subjectData.getId(), subjectData.getFaculty());
 
 				pm.makePersistent(subject);
 				logger.info("Subject created: {}", subject);
@@ -737,7 +737,7 @@ public class Resource {
 				UserData student = scoreData.getStudent();
 
 				score = new Score(
-					new Subject(subject.getStartDate(), subject.getName(), new User(proffessor.getLogin(), proffessor.getPassword(), proffessor.getName(), proffessor.getSurname(), proffessor.getRole()), subject.getId())	, 
+					new Subject(subject.getStartDate(), subject.getName(), new User(proffessor.getLogin(), proffessor.getPassword(), proffessor.getName(), proffessor.getSurname(), proffessor.getRole()), subject.getId(), subject.getFaculty())	, 
 					new User(student.getLogin(), student.getPassword(), student.getName(), student.getSurname(), student.getRole()), 
 					scoreData.getScore(), 
 					scoreData.getId());
@@ -796,7 +796,7 @@ public class Resource {
 				SubjectData subject = scoreData.getSubject();
 				score.setSubject(new Subject(subject.getStartDate(), subject.getName(), 
 				new User(subject.getProffessor().getLogin(), subject.getProffessor().getPassword(), subject.getProffessor().getName(), subject.getProffessor().getSurname(), subject.getProffessor().getRole()),
-				subject.getId()));
+				subject.getId(), subject.getFaculty()));
 				logger.info("Subject set score: {}", score);
 
 				logger.info("Setting Score score: {}", score);
