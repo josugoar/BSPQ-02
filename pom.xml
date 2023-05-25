@@ -225,7 +225,7 @@
                 <configuration>
                     <workingDirectory>${basedir}</workingDirectory>
                     <executable>doxygen</executable>
-                    <doxyfile>Doxyfile</doxyfile>
+                    <doxyfile>docs/Doxygen/Doxyfile</doxyfile>
                     <autogen>true</autogen>
                 </configuration>
                 <executions>

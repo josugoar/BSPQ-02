@@ -26,3 +26,5 @@ jobs:
         run: mvn --batch-mode --update-snapshots package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=learnify
       - name: Doxygen Action
         uses: mattnotmitt/doxygen-action@1.9.5
+        with:
+          doxyfile-path: 'docs/Doxygen'
