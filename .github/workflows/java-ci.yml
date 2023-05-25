@@ -19,7 +19,6 @@ jobs:
           output+="]}"
           echo $output
 
-jobs:
   build:
     needs: prepare-matrix
     runs-on: ubuntu-latest
