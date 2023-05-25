@@ -12,6 +12,7 @@ import javax.jdo.Transaction;
 import es.deusto.spq.server.jdo.Score;
 import es.deusto.spq.server.jdo.Subject;
 import es.deusto.spq.server.jdo.User;
+import es.deusto.spq.pojo.Faculty;
 import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.SubjectData;
@@ -674,6 +675,9 @@ public class Resource {
 						}
 						break;
 					case DEAN:
+						if (score.getSubject().getFaculty().equals(Faculty.ENGINEERING)) {
+							scoresdata.add(scoredat);
+						}
 					case ADMIN:
 						scoresdata.add(scoredat);
 						break;
