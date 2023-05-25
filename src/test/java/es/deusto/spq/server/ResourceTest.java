@@ -250,7 +250,6 @@ public class ResourceTest {
         assertEquals(Response.Status.OK, response2.getStatusInfo());
     }
 
-
     @Test
     public void testGetSubjects() {
         User proffessor = new User("prof-login", "prof-pass", "prof-name", "prof-surname", Role.PROFFESSOR);

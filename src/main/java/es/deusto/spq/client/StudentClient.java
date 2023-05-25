@@ -28,19 +28,19 @@ import es.deusto.spq.pojo.UserData;
 
 public class StudentClient extends JFrame {
 
-	protected static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger();
 
     private Client client;
-	private WebTarget webTarget;
-	private UserData user;
+    private WebTarget webTarget;
+    private UserData user;
 
     public StudentClient(UserData userData, String hostname, String port) {
         this.user = userData;
-		client = ClientBuilder.newClient();
-		webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
+        client = ClientBuilder.newClient();
+        webTarget = client.target(String.format("http://%s:%s/rest/resource", hostname, port));
 
         JScrollPane scrollPane = new JScrollPane();
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
 
         Vector<Vector<String>> data = new Vector<>();
         for (ScoreData score : getScores()) {
@@ -56,26 +56,26 @@ public class StudentClient extends JFrame {
         column.add("Subject");
         column.add("Proffessor");
         column.add("Score");
-		
-		JTable table = new JTable(data, column);
+
+        JTable table = new JTable(data, column);
         table.setEnabled(false);
-		table.setColumnSelectionAllowed(true);
-		scrollPane.setViewportView(table);
-		
-		JPanel panel = new JPanel();
-		scrollPane.setColumnHeaderView(panel);
+        table.setColumnSelectionAllowed(true);
+        scrollPane.setViewportView(table);
+
+        JPanel panel = new JPanel();
+        scrollPane.setColumnHeaderView(panel);
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setSize(600,500);
+        this.setSize(600, 500);
 
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-    
+
         JPanel loginPanel = new JPanel();
         JLabel loginKeyLabel = new JLabel("Login");
         JLabel loginValueLabel = new JLabel(userData.getLogin());
         loginPanel.add(loginKeyLabel);
         loginPanel.add(loginValueLabel);
-    
+
         JPanel passwordPanel = new JPanel();
         JLabel passwordKeyLabel = new JLabel("Password");
         JLabel passwordValueLabel = new JLabel(userData.getPassword());
@@ -102,19 +102,19 @@ public class StudentClient extends JFrame {
         add(panel);
     }
 
-    private List<ScoreData> getScores(){
-		WebTarget registerUserWebTarget = webTarget.path("scores")
-			.queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
-		Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
+    private List<ScoreData> getScores() {
+        WebTarget registerUserWebTarget = webTarget.path("scores")
+                .queryParam("login", user.getLogin()).queryParam("password", user.getPassword());
+        Invocation.Builder invocationBuilder = registerUserWebTarget.request(MediaType.APPLICATION_JSON);
 
-		Response response = invocationBuilder.get();
-		if (response.getStatus() != Status.OK.getStatusCode()) {
-			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+        Response response = invocationBuilder.get();
+        if (response.getStatus() != Status.OK.getStatusCode()) {
+            logger.error("Error connecting with the server. Code: {}", response.getStatus());
             return new ArrayList<>();
-		} else {
-			logger.info("Scores correctly retrieved");
+        } else {
+            logger.info("Scores correctly retrieved");
             return Arrays.asList(response.readEntity(ScoreData[].class));
-		}
-	}
+        }
+    }
 
 }

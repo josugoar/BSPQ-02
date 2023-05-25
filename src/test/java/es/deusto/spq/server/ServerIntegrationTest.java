@@ -31,8 +31,9 @@ import es.deusto.spq.server.jdo.User;
 @Category(IntegrationTest.class)
 public class ServerIntegrationTest {
 
-    private static final PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory("datanucleus.properties");
-    
+    private static final PersistenceManagerFactory pmf = JDOHelper
+            .getPersistenceManagerFactory("datanucleus.properties");
+
     private static HttpServer server;
     private WebTarget target;
 
@@ -72,7 +73,7 @@ public class ServerIntegrationTest {
         try {
             tx.begin();
             pm.newQuery(User.class).deletePersistentAll();
-            //pm.newQuery(Message.class).deletePersistentAll();
+            // pm.newQuery(Message.class).deletePersistentAll();
             tx.commit();
         } finally {
             if (tx.isActive()) {
@@ -89,8 +90,8 @@ public class ServerIntegrationTest {
         userData.setPassword("1234");
 
         Response response = target.path("users")
-            .request(MediaType.APPLICATION_JSON)
-            .post(Entity.entity(userData, MediaType.APPLICATION_JSON));
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(userData, MediaType.APPLICATION_JSON));
 
         assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
     }
@@ -100,9 +101,10 @@ public class ServerIntegrationTest {
         UserData userData = new UserData();
         userData.setLogin(UUID.randomUUID().toString());
         userData.setPassword("1234");
-        Response response = target.path("login").queryParam("login", userData.getLogin()).queryParam("password", userData.getPassword())
-            .request(MediaType.APPLICATION_JSON)
-            .get();
+        Response response = target.path("login").queryParam("login", userData.getLogin())
+                .queryParam("password", userData.getPassword())
+                .request(MediaType.APPLICATION_JSON)
+                .get();
 
         assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
     }
@@ -111,30 +113,30 @@ public class ServerIntegrationTest {
     public void testUpdateUser() {
 
         UserData currentUser = new UserData();
-		currentUser.setLogin("test-student");
-		currentUser.setPassword("test-student2");
-		currentUser.setName("test-student2");
-		currentUser.setSurname("test-student2");
-		currentUser.setRole(Role.STUDENT);
+        currentUser.setLogin("test-student");
+        currentUser.setPassword("test-student2");
+        currentUser.setName("test-student2");
+        currentUser.setSurname("test-student2");
+        currentUser.setRole(Role.STUDENT);
 
         Response response = target.path("users/" + currentUser.getLogin() + "/update")
-        .queryParam("login", "test-admin").queryParam("password", "test-admin")
-            .request(MediaType.APPLICATION_JSON)
-            .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
+                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+                .request(MediaType.APPLICATION_JSON)
+                .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
 
         assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
 
         Response response2 = target.path("users/" + "test-studentfake" + "/update")
-        .queryParam("login", "test-admin").queryParam("password", "test-admin")
-            .request(MediaType.APPLICATION_JSON)
-            .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
+                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+                .request(MediaType.APPLICATION_JSON)
+                .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
 
         assertEquals(Response.Status.NOT_FOUND, response2.getStatusInfo());
 
         Response response3 = target.path("users/" + currentUser.getLogin() + "/update")
-        .queryParam("login", "test-adminfake").queryParam("password", "test-adminfake")
-            .request(MediaType.APPLICATION_JSON)
-            .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
+                .queryParam("login", "test-adminfake").queryParam("password", "test-adminfake")
+                .request(MediaType.APPLICATION_JSON)
+                .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
 
         assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
     }
@@ -143,23 +145,23 @@ public class ServerIntegrationTest {
     public void testDeleteUser() {
 
         Response response = target.path("users/" + "test-student" + "/delete")
-        .queryParam("login", "test-admin").queryParam("password", "test-admin")
-            .request(MediaType.APPLICATION_JSON)
-            .delete();
+                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+                .request(MediaType.APPLICATION_JSON)
+                .delete();
 
         assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
 
         Response response2 = target.path("users/" + "test-studentfake" + "/delete")
-        .queryParam("login", "test-admin").queryParam("password", "test-admin")
-            .request(MediaType.APPLICATION_JSON)
-            .delete();
+                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+                .request(MediaType.APPLICATION_JSON)
+                .delete();
 
         assertEquals(Response.Status.NOT_FOUND, response2.getStatusInfo());
 
         Response response3 = target.path("users/" + "test-student" + "/delete")
-        .queryParam("login", "test-adminfake").queryParam("password", "test-adminfake")
-            .request(MediaType.APPLICATION_JSON)
-            .delete();
+                .queryParam("login", "test-adminfake").queryParam("password", "test-adminfake")
+                .request(MediaType.APPLICATION_JSON)
+                .delete();
 
         assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
     }
