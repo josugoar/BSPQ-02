@@ -33,7 +33,6 @@ import es.deusto.spq.server.jdo.Score;
 import es.deusto.spq.server.jdo.Subject;
 import es.deusto.spq.server.jdo.User;
 
-
 public class ResourceTest {
 
     private Resource resource;
