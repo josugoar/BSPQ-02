@@ -678,6 +678,7 @@ public class Resource {
 						if (score.getSubject().getFaculty().equals(Faculty.ENGINEERING)) {
 							scoresdata.add(scoredat);
 						}
+						break;
 					case ADMIN:
 						scoresdata.add(scoredat);
 						break;
