@@ -7,4 +7,4 @@ RUN cd learnify && mvn compile datanucleus:enhance
 # change to this directory
 WORKDIR /learnify
 # Specify which command will be launched when starting the container
-CMD ["mvn", "exec:java"]
+CMD ["mvn", "exec:java", "-Pgrizzly-server"]

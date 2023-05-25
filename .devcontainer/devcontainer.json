@@ -3,8 +3,8 @@
 	"build": {
 		"context": "..",
 		"dockerfile": "../Dockerfile"
-	}
+	},
 	"forwardPorts": [
-		9080:8080
-	],
+		8080
+	]
 }
