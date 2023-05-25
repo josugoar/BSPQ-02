@@ -1,0 +1,152 @@
+\hypertarget{md_Docker_README_autotoc_md1}{}\doxysection{Testing Docker}\label{md_Docker_README_autotoc_md1}
+0. Create a Dockerfile 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\# Specifies the base image}
+\DoxyCodeLine{FROM maven:3.8.1-\/openjdk-\/11}
+\DoxyCodeLine{\# Copy the source code to the image}
+\DoxyCodeLine{COPY . /learnify}
+\DoxyCodeLine{\# Execute the maven build}
+\DoxyCodeLine{RUN cd learnify \&\& mvn compile datanucleus:enhance}
+\DoxyCodeLine{\# change to this directory}
+\DoxyCodeLine{WORKDIR /learnify}
+\DoxyCodeLine{\# Specify which command will be launched when starting the container}
+\DoxyCodeLine{CMD ["{}mvn"{}, "{}exec:java"{}, "{}-\/Pgrizzly-\/server"{}]}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyEnumerate}
+\item Build an image\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker build . -\/t learnify\_server}
+
+\end{DoxyCode}
+
+\item Run a container based on the above generated image\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker run -\/p 9080:8080 learnify\_server}
+
+\end{DoxyCode}
+
+\item Access the server by going to a browser\+: \href{http://localhost:9080/rest/resource}{\texttt{ http\+://localhost\+:9080/rest/resource}}
+\item You can launch the container in detached mode\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker run -\/d -\/p 9080:8080 -\/-\/name server learnify\_server}
+
+\end{DoxyCode}
+
+\item You can get a shell to that server by typing\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker exec -\/it server /bin/bash}
+
+\end{DoxyCode}
+
+\item Print logs\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker logs server}
+
+\end{DoxyCode}
+
+\end{DoxyEnumerate}\hypertarget{md_Docker_README_autotoc_md2}{}\doxysection{Testing Docker-\/\+Compose}\label{md_Docker_README_autotoc_md2}
+
+\begin{DoxyEnumerate}
+\item Create a My\+SQL container\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker run -\/-\/rm -\/-\/name database -\/e MYSQL\_ROOT\_PASSWORD=root -\/d mysql:8.0.25}
+
+\end{DoxyCode}
+
+\item Create script to insert data in the DB\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker exec -\/i database mysql -\/uroot -\/proot < sql/create-\/learnify.sql}
+
+\end{DoxyCode}
+
+\item Stop them since we need to connect these containers through a common network\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker stop server}
+\DoxyCodeLine{docker stop database}
+
+\end{DoxyCode}
+
+\item Create a new network\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker network create learnify\_default}
+
+\end{DoxyCode}
+
+\item Modify datanucles.\+properties to point to the name of the container, which acts as the host/node name\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{javax.jdo.option.ConnectionURL=jdbc:mysql:\textcolor{comment}{//database/learnifyDB?useUnicode=true\&useJDBCCompliantTimezoneShift=true\&useLegacyDatetimeCode=false\&serverTimezone=UTC}}
+
+\end{DoxyCode}
+
+\item Modify the Main class of the Grizzly server to accept connections from anywhere\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{public} \textcolor{keyword}{static} \textcolor{keyword}{final} String BASE\_URI = \textcolor{stringliteral}{"{}http://0.0.0.0:8080/rest/"{}};}
+
+\end{DoxyCode}
+
+\item Configure a user to be able to access from remote servers to the database\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{CREATE} DATABASE learnifyDB;}
+\DoxyCodeLine{\textcolor{keyword}{CREATE} \textcolor{keyword}{USER} \textcolor{keywordflow}{IF} \textcolor{keyword}{NOT} \textcolor{keyword}{EXISTS} \textcolor{stringliteral}{'spq'}@\textcolor{stringliteral}{'localhost'} IDENTIFIED \textcolor{keyword}{BY} \textcolor{stringliteral}{'spq'};}
+\DoxyCodeLine{\textcolor{keyword}{GRANT} \textcolor{keyword}{ALL} \textcolor{keyword}{ON} learnifyDB.* \textcolor{keyword}{TO} \textcolor{stringliteral}{'spq'}@\textcolor{stringliteral}{'localhost'};}
+\DoxyCodeLine{\textcolor{keyword}{CREATE} \textcolor{keyword}{USER} \textcolor{keywordflow}{IF} \textcolor{keyword}{NOT} \textcolor{keyword}{EXISTS} \textcolor{stringliteral}{'spq'}@\textcolor{stringliteral}{'\%'} IDENTIFIED \textcolor{keyword}{BY} \textcolor{stringliteral}{'spq'};}
+\DoxyCodeLine{\textcolor{keyword}{GRANT} \textcolor{keyword}{ALL} \textcolor{keyword}{ON} learnifyDB.* \textcolor{keyword}{TO} \textcolor{stringliteral}{'spq'}@\textcolor{stringliteral}{'\%'};}
+
+\end{DoxyCode}
+
+\item Run the two containers connected to the same network\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker run -\/-\/rm -\/-\/name database -\/-\/network learnify\_default -\/e MYSQL\_ROOT\_PASSWORD=root -\/d mysql:8.0.25}
+\DoxyCodeLine{docker exec -\/i database mysql -\/uroot -\/proot < sql/create-\/learnify.sql}
+\DoxyCodeLine{}
+\DoxyCodeLine{docker run -\/-\/rm -\/d -\/p 9080:8080 -\/-\/network learnify\_default -\/-\/name server learnify}
+\DoxyCodeLine{docker exec server mvn datanucleus:schema-\/create}
+\DoxyCodeLine{docker exec -\/i database mysql -\/uroot -\/proot < sql/create-\/data.sql}
+
+\end{DoxyCode}
+
+\item Run all together thanks to Docker-\/compose 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{volumes:}
+\DoxyCodeLine{    db\_data:}
+\DoxyCodeLine{}
+\DoxyCodeLine{services:}
+\DoxyCodeLine{    database:}
+\DoxyCodeLine{        image: mysql:8.0.25}
+\DoxyCodeLine{        volumes:}
+\DoxyCodeLine{            -\/ db\_data:/var/lib/mysql}
+\DoxyCodeLine{        restart: always}
+\DoxyCodeLine{        environment:}
+\DoxyCodeLine{            MYSQL\_ROOT\_PASSWORD: root}
+\DoxyCodeLine{            MYSQL\_DATABASE: learnifyDB}
+\DoxyCodeLine{            MYSQL\_USER: spq}
+\DoxyCodeLine{            MYSQL\_PASSWORD: spq}
+\DoxyCodeLine{    server:}
+\DoxyCodeLine{        depends\_on:}
+\DoxyCodeLine{            -\/ database}
+\DoxyCodeLine{        build: .}
+\DoxyCodeLine{        ports:}
+\DoxyCodeLine{            -\/ "{}9080:8080"{}}
+\DoxyCodeLine{        restart: always}
+
+\end{DoxyCode}
+
+\item Run the docker-\/compose 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker container stop database}
+\DoxyCodeLine{docker container stop server}
+\DoxyCodeLine{docker container ls}
+\DoxyCodeLine{docker compose build}
+\DoxyCodeLine{docker compose up -\/d}
+\DoxyCodeLine{docker compose exec server mvn datanucleus:schema-\/create}
+\DoxyCodeLine{docker compose exec database mysql -\/uroot -\/proot < sql/create-\/data.sql}
+\DoxyCodeLine{docker exec -\/it server /bin/bash}
+
+\end{DoxyCode}
+
+\item Test the service deployed with Docker-\/compose which accesses to a database in My\+SQL\+: \href{http://0.0.0.0:9080/rest/resource}{\texttt{ http\+://0.\+0.\+0.\+0\+:9080/rest/resource}} 
+\end{DoxyEnumerate}
