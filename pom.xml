@@ -223,9 +223,9 @@
                 <artifactId>doxygen-maven-plugin</artifactId>
                 <version>0.1.0</version>
                 <configuration>
-                    <workingDirectory>${basedir}</workingDirectory>
+                    <workingDirectory>${basedir}/docs/Doxygen</workingDirectory>
                     <executable>doxygen</executable>
-                    <doxyfile>docs/Doxygen/Doxyfile</doxyfile>
+                    <doxyfile>Doxyfile</doxyfile>
                     <autogen>true</autogen>
                 </configuration>
                 <executions>
