@@ -47,7 +47,13 @@ public class Resource {
 		this.pm = pmf.getPersistenceManager();
 		this.tx = pm.currentTransaction();
 	}
+	/**
 
+    Authenticates a user with the given login and password. It is called in every API call method with the request maker's login and password.
+    @param login the email address of the user
+    @param password the password of the user
+    @return true if the user is authenticated, false otherwise
+    */
 	private boolean authenticate(String login, String password){
 		User user = null;
 		try {
@@ -77,7 +83,12 @@ public class Resource {
 		}
 		
 	}
-
+	/**
+    Authorizes a user with the given login and roles. It is called in every API call method with the request maker's login and password.
+    @param login the login of the user
+    @param roles the roles to authorize
+    @return true if the user is authorized with any of the given roles, false otherwise
+    */
 	private boolean authorize(String login, Role[] roles){
 		User user = null;
 		try {
@@ -107,7 +118,11 @@ public class Resource {
 			return false;
 		}
 	}
-
+	/**
+    Handles the login request
+    @param logIn the email address of the user
+    @param password the password of the user
+    */
 	@GET
 	@Path("/login")
 	public Response login(@QueryParam("login") String logIn, @QueryParam("password") String password) {
@@ -145,7 +160,12 @@ public class Resource {
 					.entity("Login details supplied for message delivery are not correct").build();
 		}
 	}
-
+	/**
+    Retrieves a list of users. Different roles have access to different user lists.
+    @param logIn the email address of the user making the request
+    @param password the password of the user making the request
+    @return a Response object containing the list of users in JSON format
+    */
 	@GET
 	@Path("/users")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -193,7 +213,13 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Registers a new user. User making request must be ADMIN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param userData the user data to register
+    @return a Response object indicating the success or failure of the registration
+    */
 	@POST
 	@Path("/users")
 	public Response registerUser(@QueryParam("login") String logIn, @QueryParam("password") String password, UserData userData) {
@@ -245,7 +271,13 @@ public class Resource {
 
 		}
 	}
-
+	/**
+    Retrieves a user by login. Different roles have access to different users.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param login the login of the user to retrieve
+    @return a Response object containing the user information in JSON format
+    */
 	@GET
 	@Path("/users/{login}/get")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -293,7 +325,14 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Updates a user by login. User making request must be ADMIN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param login the login of the user to update
+    @param userData the updated user data
+    @return a Response object indicating the success or failure of the update
+    */
 	@PUT
 	@Path("/users/{login}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -358,7 +397,13 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Deletes a user by login. User making request must be ADMIN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param login the login of the user to delete
+    @return a Response object indicating the success or failure of the deletion
+    */
 	@DELETE
 	@Path("/users/{login}/delete")
 	public Response deleteUser(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("login") String login) {
@@ -407,7 +452,12 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Retrieves a list of subjects. Different roles have access to different subjects.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @return a Response object containing the list of subjects in JSON format
+    */
 	@GET
 	@Path("/subjects")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -454,9 +504,14 @@ public class Resource {
 				tx.rollback();
 			}
 		}
-
 	}
-
+	/**
+    Registers a new subject. User making request must be DEAN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param subjectData the data of the subject to be registered
+    @return a Response object indicating the success or failure of the registration
+    */
 	@POST
 	@Path("/subjects")
 	public Response registerSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, SubjectData subjectData) {
@@ -511,7 +566,14 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Updates an existing subject. User making request must be DEAN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param id the ID of the subject to be updated
+    @param subjectData the updated data of the subject
+    @return a Response object indicating the success or failure of the update
+    */
 	@PUT
 	@Path("/subjects/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -573,7 +635,13 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Deletes a subject. User making request must be DEAN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param id the ID of the subject to be deleted
+    @return a Response object indicating the success or failure of the deletion
+    */
 	@DELETE
 	@Path("/subjects/{id}/delete")
 	public Response deleteSubject(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") Integer id) {
@@ -622,7 +690,12 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Retrieves a list of scores based on the user's role.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @return a Response object containing the scores based on the user's role
+    */
 	@GET
 	@Path("/scores")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -694,7 +767,13 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Registers a new score. User making request must be DEAN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param scoreData the data of the score to be registered
+    @return a Response object indicating the success or failure of the registration
+    */
 	@POST
 	@Path("/scores")
 	public Response registerScore(@QueryParam("login") String logIn, @QueryParam("password") String password, ScoreData scoreData) {
@@ -753,8 +832,14 @@ public class Resource {
 			}
 		}
 	}
-
-
+	/**
+    Updates an existing score. User making request must be PROFFESSOR.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param id the ID of the score to be updated
+    @param scoreData the updated data of the score
+    @return a Response object indicating the success or failure of the update
+    */
 	@PUT
 	@Path("/scores/{id}/update")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -819,7 +904,13 @@ public class Resource {
 			}
 		}
 	}
-
+	/**
+    Deletes a score. User making request must be DEAN.
+    @param logIn the login of the user making the request
+    @param password the password of the user making the request
+    @param id the ID of the score to be deleted
+    @return a Response object indicating the success or failure of the deletion
+    */
 	@DELETE
 	@Path("/scores/{id}/delete")
 	public Response deleteScore(@QueryParam("login") String logIn, @QueryParam("password") String password, @PathParam("id") Integer id) {
