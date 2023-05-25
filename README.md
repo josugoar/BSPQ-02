@@ -29,15 +29,6 @@ Run the following command to create database schema for this sample.
 
       mvn datanucleus:schema-create
 
-Run the following command to create the data.
-
-      mysql -p --user root < sql/create-data.sql
-
-On Windows:
-
-      mysql -p --user root
-      source sql/create-data.sql  
-
 Integration tests can be launched using the following command. An embedded Grizzly HTTP server will be launched to perform real calls
 to the REST API and to the MySQL database.
 
@@ -46,6 +37,15 @@ to the REST API and to the MySQL database.
 Performance tests can be launched using the following command.
 
       mvn verify -Pperformance-tests
+
+Run the following command to create the data.
+
+      mysql -p --user root < sql/create-data.sql
+
+On Windows:
+
+      mysql -p --user root
+      source sql/create-data.sql  
 
 To launch the server run the command
 
