@@ -12,24 +12,24 @@ RUN cd learnify && mvn compile datanucleus:enhance
 # change to this directory
 WORKDIR /learnify
 # Specify which command will be launched when starting the container
-CMD ["mvn", "exec:java"]
+CMD ["mvn", "exec:java", "-Pgrizzly-server"]
 ```
 
 1. Build an image: 
 ````
-	docker build . -t learnify
+	docker build . -t learnify_server
 ````
 
 2. Run a container based on the above generated image: 
 ````
-	docker run -p 9080:8080 learnify
+	docker run -p 9080:8080 learnify_server
 ````
 
 3. Access the server by going to a browser: http://localhost:9080/rest/resource
 
 4. You can launch the container in detached mode: 
 ````
-	docker run -d -p 9080:8080 --name server learnify
+	docker run -d -p 9080:8080 --name server learnify_server
 ````
 
 5. You can get a shell to that server by typing: 
@@ -62,7 +62,7 @@ CMD ["mvn", "exec:java"]
 
 10. Create a new network: 
 ````
-	docker network create my-network
+	docker network create learnify_default
 ````
 
 11. Modify datanucles.properties to point to the name of the container, which acts as the host/node name:
@@ -86,12 +86,11 @@ CMD ["mvn", "exec:java"]
 
 14. Run the two containers connected to the same network:
 ````
-docker run --rm --name database --network my-network -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0.25
+docker run --rm --name database --network learnify_default -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0.25
 docker exec -i database mysql -uroot -proot < sql/create-learnify.sql
 
-docker run --rm -d -p 9080:8080 --network my-network --name server learnify
+docker run --rm -d -p 9080:8080 --network learnify_default --name server learnify
 docker exec server mvn datanucleus:schema-create
-
 docker exec -i database mysql -uroot -proot < sql/create-data.sql
 ````
 
@@ -132,4 +131,4 @@ services:
 	docker exec -it server /bin/bash
 ```
 
-17. Test the service deployed with Docker-compose which accesses to a database in MySQL: http://localhost:9080/rest/resource
+17. Test the service deployed with Docker-compose which accesses to a database in MySQL: http://0.0.0.0:9080/rest/resource
