@@ -59,4 +59,4 @@ To generate documentation write:
 
       mvn doxygen:report
 
-[https://gaizka-basterra.github.io/Learnify/](Doxygen documentation)
+[Doxygen documentation](https://gaizka-basterra.github.io/Learnify/)
