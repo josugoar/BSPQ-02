@@ -58,3 +58,7 @@ Now, the client sample code can be executed in a new command window with
 To generate documentation write: 
 
       mvn doxygen:report
+    
+To access the documentation, go to:
+
+      https://gaizka-basterra.github.io/Learnify/
