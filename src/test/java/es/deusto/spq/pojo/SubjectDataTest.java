@@ -20,6 +20,7 @@ public class SubjectDataTest {
         subjectData.setName("name");
         subjectData.setProffessor(proffessor);
         subjectData.setStartDate(startD);
+        subjectData.setFaculty(Faculty.ENGINEERING);
     }
 
     @Test
