@@ -24,6 +24,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import es.deusto.spq.pojo.Faculty;
 import es.deusto.spq.pojo.Role;
 import es.deusto.spq.pojo.ScoreData;
 import es.deusto.spq.pojo.SubjectData;
@@ -258,8 +259,9 @@ public class ResourceTest {
         subjectData.setName("test-subject");
         subjectData.setProffessor(proffessordat);
         subjectData.setId(1);
+        subjectData.setFaculty(Faculty.ENGINEERING);
 
-        Subject subject = new Subject(subjectData.getStartDate(), subjectData.getName(), proffessor, subjectData.getId());
+        Subject subject = new Subject(subjectData.getStartDate(), subjectData.getName(), proffessor, subjectData.getId(), subjectData.getFaculty());
         List<Subject> subjectlist = new ArrayList<>();
         subjectlist.add(subject);
 
@@ -278,6 +280,7 @@ public class ResourceTest {
         subjectData.setName("test-subject");
         subjectData.setProffessor(proffessor);
         subjectData.setId(1);
+        subjectData.setFaculty(Faculty.ENGINEERING);
         Response response1 = resource.registerSubject("test-dean", "test-dean", subjectData);
 
         assertEquals(Response.Status.OK, response1.getStatusInfo());
@@ -297,6 +300,7 @@ public class ResourceTest {
         subjectData.setName("test-subject");
         subjectData.setProffessor(proffessor);
         subjectData.setId(1);
+        subjectData.setFaculty(Faculty.ENGINEERING);
 
         Response response1 = resource.updateSubject("test-dean", "test-dean", subjectData.getId(), subjectData);
 
@@ -317,6 +321,7 @@ public class ResourceTest {
         subjectData.setName("test-subject");
         subjectData.setProffessor(proffessor);
         subjectData.setId(1);
+        subjectData.setFaculty(Faculty.ENGINEERING);
 
         Response response1 = resource.deleteSubject("test-dean", "test-dean", subjectData.getId());
 
@@ -335,14 +340,17 @@ public class ResourceTest {
         Subject subject1 = new Subject();
         subject1.setId(1);
         subject1.setProffessor(proffessorUser);
+        subject1.setFaculty(Faculty.ENGINEERING);
 
         Subject subject2 = new Subject();
         subject2.setId(2);
         subject2.setProffessor(proffessorUser);
+        subject2.setFaculty(Faculty.ENGINEERING);
 
         Subject subject3 = new Subject();
         subject3.setId(3);
         subject3.setProffessor(fakeProffessor);
+        subject3.setFaculty(Faculty.LAW);
 
         Score score1 = new Score(
             subject1,
@@ -385,6 +393,7 @@ public class ResourceTest {
         SubjectData subjectData = new SubjectData();
         subjectData.setId(1);
         subjectData.setProffessor(new UserData(proffessorUser));
+        subjectData.setFaculty(Faculty.ENGINEERING);
 
         ScoreData scoreData = new ScoreData();
         scoreData.setId(1);
@@ -413,6 +422,7 @@ public class ResourceTest {
         SubjectData subjectData = new SubjectData();
         subjectData.setId(1);
         subjectData.setProffessor(new UserData(proffessorUser));
+        subjectData.setFaculty(Faculty.ENGINEERING);
 
         ScoreData scoreData = new ScoreData();
         scoreData.setId(1);
@@ -446,6 +456,7 @@ public class ResourceTest {
         SubjectData subjectData = new SubjectData();
         subjectData.setId(1);
         subjectData.setProffessor(new UserData(proffessorUser));
+        subjectData.setFaculty(Faculty.ENGINEERING);
 
         ScoreData scoreData = new ScoreData();
         scoreData.setId(1);

@@ -8,6 +8,7 @@ import java.sql.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import es.deusto.spq.pojo.Faculty;
 import es.deusto.spq.pojo.Role;
 
 public class ScoreTest {
@@ -20,7 +21,7 @@ public class ScoreTest {
     @Before
     public void setUp() {
         proffessor = new User("test-login", "test-password", "test-name", "test-surnmame", Role.PROFFESSOR);
-        subject = new Subject(new Date(0), "test-name", proffessor, 0);
+        subject = new Subject(new Date(0), "test-name", proffessor, 0, Faculty.ENGINEERING);
         student = new User("test-login", "test-password", "test-name", "test-surnmame", Role.STUDENT);
         score = new Score(subject, student, 10.0f, 0);
     }    
@@ -70,7 +71,7 @@ public class ScoreTest {
 
     @Test
     public void testSetSubject() {
-        Subject newSubject = new Subject(new Date(1000), "test-name2", proffessor, 10);
+        Subject newSubject = new Subject(new Date(1000), "test-name2", proffessor, 10, Faculty.ECONOMICS);
         score.setSubject(newSubject);
         assertEquals(newSubject, score.getSubject());
     }

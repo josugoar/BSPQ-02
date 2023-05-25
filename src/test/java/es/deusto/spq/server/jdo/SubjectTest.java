@@ -7,6 +7,7 @@ import java.sql.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import es.deusto.spq.pojo.Faculty;
 import es.deusto.spq.pojo.Role;
 
 public class SubjectTest {
@@ -17,7 +18,7 @@ public class SubjectTest {
 
     @Before
     public void setUp() {
-        subject = new Subject(date, "test-name", proffessor, 1);
+        subject = new Subject(date, "test-name", proffessor, 1, Faculty.ENGINEERING);
     }
 
 
