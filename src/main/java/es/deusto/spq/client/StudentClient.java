@@ -1,6 +1,7 @@
 package es.deusto.spq.client;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -109,10 +110,11 @@ public class StudentClient extends JFrame {
 		Response response = invocationBuilder.get();
 		if (response.getStatus() != Status.OK.getStatusCode()) {
 			logger.error("Error connecting with the server. Code: {}", response.getStatus());
+            return new ArrayList<>();
 		} else {
-			logger.info("User correctly updated");
+			logger.info("Scores correctly retrieved");
+            return Arrays.asList(response.readEntity(ScoreData[].class));
 		}
-		return Arrays.asList(response.readEntity(ScoreData[].class));
 	}
 
 }
