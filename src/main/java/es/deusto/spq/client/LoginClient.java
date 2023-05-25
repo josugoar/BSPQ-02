@@ -104,12 +104,17 @@ class LoginClient extends JFrame implements ActionListener {
                     break;
 
                 case PROFFESSOR:
-                case DEAN:
                     ProffessorClient proffessorClient = new ProffessorClient(user, hostname, port);
                     setVisible(false);
                     proffessorClient.setVisible(true);
                     break;
 
+                case DEAN:
+                    DecanClient deanClient = new DecanClient(user, hostname, port);
+                    setVisible(false);
+                    deanClient.setVisible(true);
+                    break;
+            
                 default:
                     logger.error("Unrecognized role");
                     break;
