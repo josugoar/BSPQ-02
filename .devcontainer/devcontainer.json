@@ -1,0 +1,10 @@
+{
+	"name": "Learnify",
+	"build": {
+		"context": "..",
+		"dockerfile": "../Dockerfile"
+	},
+	"forwardPorts": [
+		8080
+	]
+}
