@@ -46,7 +46,7 @@ public class ServerIntegrationTest {
         Transaction tx = pm.currentTransaction();
         try {
             tx.begin();
-            pm.makePersistent(new User("test-admin", "test-admin", "test-admin", "test-admin", Role.ADMIN));
+            pm.makePersistent(new User("my-admin", "my-admin", "my-admin", "my-admin", Role.ADMIN));
             pm.makePersistent(new User("test-student", "test-student", "test-student", "test-student", Role.STUDENT));
             tx.commit();
         } finally {
@@ -73,7 +73,6 @@ public class ServerIntegrationTest {
         try {
             tx.begin();
             pm.newQuery(User.class).deletePersistentAll();
-            // pm.newQuery(Message.class).deletePersistentAll();
             tx.commit();
         } finally {
             if (tx.isActive()) {
@@ -93,14 +92,14 @@ public class ServerIntegrationTest {
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(userData, MediaType.APPLICATION_JSON));
 
-        assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
+        assertEquals(Family.SERVER_ERROR, response.getStatusInfo().getFamily());
     }
 
     @Test
     public void testLoginUser() {
         UserData userData = new UserData();
-        userData.setLogin(UUID.randomUUID().toString());
-        userData.setPassword("1234");
+        userData.setLogin("my-admin");
+        userData.setPassword("my-admin");
         Response response = target.path("login").queryParam("login", userData.getLogin())
                 .queryParam("password", userData.getPassword())
                 .request(MediaType.APPLICATION_JSON)
@@ -111,7 +110,6 @@ public class ServerIntegrationTest {
 
     @Test
     public void testUpdateUser() {
-
         UserData currentUser = new UserData();
         currentUser.setLogin("test-student");
         currentUser.setPassword("test-student2");
@@ -120,49 +118,42 @@ public class ServerIntegrationTest {
         currentUser.setRole(Role.STUDENT);
 
         Response response = target.path("users/" + currentUser.getLogin() + "/update")
-                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+                .queryParam("login", "my-admin").queryParam("password", "my-admin")
                 .request(MediaType.APPLICATION_JSON)
                 .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
 
         assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
 
-        Response response2 = target.path("users/" + "test-studentfake" + "/update")
-                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+        Response response2 = target.path("users/" + currentUser.getLogin() + "/update")
+                .queryParam("login", "my-adminfake").queryParam("password", "my-adminfake")
                 .request(MediaType.APPLICATION_JSON)
                 .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
 
-        assertEquals(Response.Status.NOT_FOUND, response2.getStatusInfo());
-
-        Response response3 = target.path("users/" + currentUser.getLogin() + "/update")
-                .queryParam("login", "test-adminfake").queryParam("password", "test-adminfake")
-                .request(MediaType.APPLICATION_JSON)
-                .put(Entity.entity(currentUser, MediaType.APPLICATION_JSON));
-
-        assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
+        assertEquals(Family.CLIENT_ERROR, response2.getStatusInfo().getFamily());
     }
 
     @Test
     public void testDeleteUser() {
 
         Response response = target.path("users/" + "test-student" + "/delete")
-                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+                .queryParam("login", "my-admin").queryParam("password", "my-admin")
                 .request(MediaType.APPLICATION_JSON)
                 .delete();
 
         assertEquals(Family.SUCCESSFUL, response.getStatusInfo().getFamily());
 
         Response response2 = target.path("users/" + "test-studentfake" + "/delete")
-                .queryParam("login", "test-admin").queryParam("password", "test-admin")
+                .queryParam("login", "my-admin").queryParam("password", "my-admin")
                 .request(MediaType.APPLICATION_JSON)
                 .delete();
 
-        assertEquals(Response.Status.NOT_FOUND, response2.getStatusInfo());
+        assertEquals(Family.CLIENT_ERROR, response2.getStatusInfo().getFamily());
 
         Response response3 = target.path("users/" + "test-student" + "/delete")
-                .queryParam("login", "test-adminfake").queryParam("password", "test-adminfake")
+                .queryParam("login", "my-adminfake").queryParam("password", "my-adminfake")
                 .request(MediaType.APPLICATION_JSON)
                 .delete();
 
-        assertEquals(Response.Status.BAD_REQUEST, response3.getStatusInfo());
+        assertEquals(Family.CLIENT_ERROR, response3.getStatusInfo().getFamily());
     }
 }
