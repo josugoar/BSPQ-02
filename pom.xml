@@ -11,7 +11,7 @@
 	<name>Learnify</name>
 
 	<properties>
-		<doxygen.config.file>${basedir}/src/main/resources/Doxyfile</doxygen.config.file>
+		<doxygen.config.file>${basedir}/docs/Doxygen/Doxyfile</doxygen.config.file>
 		<maven.compiler.release>8</maven.compiler.release>
 		<config.files.dir>${basedir}/src/main/resources</config.files.dir>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
